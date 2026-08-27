@@ -8,3 +8,4 @@ dist-ssr/
 .vscode/
 .idea/
 graphify-out/
+.worktrees/
