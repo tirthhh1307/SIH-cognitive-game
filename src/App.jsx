@@ -13,7 +13,9 @@ import { toggleMute, playStarSound } from './utils/audio';
 import { speakText } from './utils/speech';
 import { AppNav } from './components/AppNav';
 import { ConsentGate } from './components/ConsentGate';
-import { loadPlatformState, savePlatformState } from './utils/platform';
+import { getAdaptiveDifficulty, loadPlatformState, recordAttempt, savePlatformState } from './utils/platform';
+import { GameLibrary } from './components/GameLibrary';
+import { GameRunner } from './components/games/GameRunner';
 
 export default function App() {
   const [platformState, setPlatformState] = useState(() => loadPlatformState(localStorage));
@@ -21,6 +23,8 @@ export default function App() {
   const [activeModal, setActiveModal] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
   const [starNotification, setStarNotification] = useState(null);
+  const [selectedGame, setSelectedGame] = useState(null);
+  const [togetherMode, setTogetherMode] = useState(false);
 
   const { profile, settings, stars } = platformState;
   const playerName = profile.name;
@@ -58,6 +62,29 @@ export default function App() {
 
   const handleCloseModal = () => {
     setActiveModal(null);
+  };
+
+  const handleSelectLibraryGame = (game, together) => {
+    setSelectedGame(game);
+    setTogetherMode(together);
+  };
+
+  const handleLibraryComplete = result => {
+    const earnedStars = 5 + Math.round(result.accuracy / 10);
+    setPlatformState(prev => recordAttempt(prev, {
+      id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${selectedGame.id}`,
+      gameId: selectedGame.id,
+      category: selectedGame.category,
+      stage: profile.stage,
+      difficulty: getAdaptiveDifficulty(prev, selectedGame, profile.stage),
+      ...result,
+      earnedStars,
+      together: togetherMode,
+      completedAt: new Date().toISOString()
+    }));
+    playStarSound();
+    setStarNotification({ amount: earnedStars, reason: `Completed ${selectedGame.name}!` });
+    setTimeout(() => setStarNotification(null), 3000);
   };
 
   const categoryCards = [
@@ -130,7 +157,11 @@ export default function App() {
               />
             ))}
           </div>
-        </main> : (
+        </main> : activeView === 'play' ? (
+          <main className="platform-view-shell">
+            <GameLibrary stage={profile.stage} onSelectGame={handleSelectLibraryGame} />
+          </main>
+        ) : (
           <main className="platform-view placeholder-view">
             <p className="eyebrow">Offline cognitive companion</p>
             <h2>{activeView === 'play' ? 'Game Library' : activeView === 'check-in' ? 'Daily Check-in' : activeView === 'anchors' ? 'Memory Anchors' : 'Caregiver Dashboard'}</h2>
@@ -179,6 +210,18 @@ export default function App() {
           voiceEnabled={settings.voice}
           setVoiceEnabledState={(voice) => setPlatformState(prev => ({ ...prev, settings: { ...prev.settings, voice } }))}
           stars={stars}
+        />
+      )}
+
+      {selectedGame && (
+        <GameRunner
+          game={selectedGame}
+          stage={profile.stage}
+          difficulty={getAdaptiveDifficulty(platformState, selectedGame, profile.stage)}
+          playerName={playerName}
+          together={togetherMode}
+          onComplete={handleLibraryComplete}
+          onClose={() => setSelectedGame(null)}
         />
       )}
 

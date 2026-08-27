@@ -21,3 +21,13 @@ test('catalog contains all 26 unique documented games', () => {
 test('every game config is runnable', () => {
   assert.deepEqual(validateGameCatalog(GAMES), []);
 });
+
+test('every engine has configured games and each game has three playable records', () => {
+  assert.deepEqual(new Set(GAMES.map(({ engine }) => engine)), new Set([
+    'match', 'sequence', 'recall', 'choice', 'sorting', 'audio', 'action'
+  ]));
+  for (const game of GAMES) {
+    const count = game.content.rounds?.length ?? game.content.items?.length ?? game.content.pairs?.length ?? 0;
+    assert.ok(count >= 3, `${game.id} needs at least three playable records`);
+  }
+});
