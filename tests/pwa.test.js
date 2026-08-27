@@ -1,0 +1,41 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import { readFile } from 'node:fs/promises';
+
+test('manifest provides standalone install metadata', async () => {
+  const manifest = JSON.parse(await readFile('public/manifest.webmanifest', 'utf8'));
+  assert.equal(manifest.name, 'Apon Mon Cognitive Companion');
+  assert.equal(manifest.display, 'standalone');
+  assert.equal(manifest.start_url, '/');
+  assert.ok(manifest.icons.some(icon => icon.src === '/app-icon.svg'));
+});
+
+test('service worker installs the complete offline shell', async () => {
+  const worker = await readFile('public/sw.js', 'utf8');
+  const handlers = {};
+  let installedFiles = [];
+  const context = {
+    self: {
+      location: { origin: 'https://example.test' },
+      addEventListener: (name, handler) => { handlers[name] = handler; },
+      skipWaiting: () => Promise.resolve(),
+      clients: { claim: () => Promise.resolve() }
+    },
+    caches: {
+      open: async () => ({ addAll: async files => { installedFiles = files; } }),
+      keys: async () => [],
+      delete: async () => true,
+      match: async () => undefined
+    },
+    fetch: async () => ({ ok: true, clone() { return this; } }),
+    URL,
+    Promise
+  };
+  vm.runInNewContext(worker, context);
+  assert.deepEqual(Object.keys(handlers).sort(), ['activate', 'fetch', 'install']);
+  let installation;
+  handlers.install({ waitUntil: promise => { installation = promise; } });
+  await installation;
+  assert.deepEqual([...installedFiles], ['/', '/index.html', '/manifest.webmanifest', '/app-icon.svg', '/avatar_apoi.jpg', '/scenic_bg.jpg']);
+});

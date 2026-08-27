@@ -1,0 +1,17 @@
+{
+  "name": "Apon Mon Cognitive Companion",
+  "short_name": "Apon Mon",
+  "description": "Offline cognitive games and memory support for older adults.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e8f5e9",
+  "theme_color": "#2e7d32",
+  "icons": [
+    {
+      "src": "/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
