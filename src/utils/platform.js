@@ -22,7 +22,8 @@ export function createInitialState() {
       fontSize: 'normal',
       highContrast: false
     },
-    difficultyByGame: {}
+    difficultyByGame: {},
+    reportsExported: 0
   };
 }
 
@@ -161,4 +162,23 @@ export function getDueReminders(state, now = new Date()) {
   const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
   const date = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
   return state.reminders.filter(reminder => reminder.enabled && reminder.time === time && reminder.lastShownDate !== date);
+}
+
+export function setBaselineFromAttempts(state, gameIds) {
+  const allowed = new Set(gameIds);
+  const grouped = state.attempts
+    .filter(attempt => allowed.has(attempt.gameId))
+    .reduce((groups, attempt) => {
+      (groups[attempt.category] ??= []).push(Number.isFinite(attempt.score) ? attempt.score : attempt.accuracy);
+      return groups;
+    }, {});
+  const entries = Object.entries(grouped);
+  if (!entries.length) return state;
+  return {
+    ...state,
+    baseline: {
+      ...state.baseline,
+      ...Object.fromEntries(entries.map(([category, scores]) => [category, average(scores)]))
+    }
+  };
 }

@@ -10,7 +10,8 @@ import {
   addCheckIn,
   upsertReminder,
   removeReminder,
-  getDueReminders
+  getDueReminders,
+  setBaselineFromAttempts
 } from '../src/utils/platform.js';
 
 const game = {
@@ -93,4 +94,12 @@ test('due reminders match local HH:MM and enabled status', () => {
   const due = getDueReminders(state, new Date(2026, 7, 27, 9, 30));
   assert.deepEqual(due.map(({ id }) => id), ['meds']);
   assert.equal(removeReminder(state, 'meds').reminders.length, 1);
+});
+
+test('baseline averages requested completed games by category', () => {
+  let state = createInitialState();
+  state = recordAttempt(state, attempt(80));
+  state = recordAttempt(state, { ...attempt(60), id: 'second' });
+  state = setBaselineFromAttempts(state, ['card-match']);
+  assert.equal(state.baseline['working-memory'], 70);
 });

@@ -13,12 +13,14 @@ import { toggleMute, playStarSound } from './utils/audio';
 import { speakText } from './utils/speech';
 import { AppNav } from './components/AppNav';
 import { ConsentGate } from './components/ConsentGate';
-import { getAdaptiveDifficulty, loadPlatformState, recordAttempt, savePlatformState } from './utils/platform';
+import { clearPlatformData, createInitialState, getAdaptiveDifficulty, loadPlatformState, recordAttempt, savePlatformState } from './utils/platform';
 import { GameLibrary } from './components/GameLibrary';
 import { GameRunner } from './components/games/GameRunner';
 import { DailyCheckIn } from './components/DailyCheckIn';
 import { MemoryAnchors } from './components/MemoryAnchors';
-import { listAnchors } from './utils/mediaStore';
+import { clearAnchors, listAnchors } from './utils/mediaStore';
+import { CaregiverDashboard } from './components/CaregiverDashboard';
+import { getGame } from './data/games';
 
 export default function App() {
   const [platformState, setPlatformState] = useState(() => loadPlatformState(localStorage));
@@ -80,6 +82,23 @@ export default function App() {
   const handleSelectLibraryGame = (game, together) => {
     setSelectedGame(game);
     setTogetherMode(together);
+  };
+
+  const handleStartGame = gameId => {
+    const game = getGame(gameId);
+    if (game) {
+      setTogetherMode(false);
+      setSelectedGame(game);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    clearPlatformData(localStorage);
+    try { await clearAnchors(); } catch {}
+    setAnchors([]);
+    setSelectedGame(null);
+    setActiveView('home');
+    setPlatformState(createInitialState());
   };
 
   const handleLibraryComplete = result => {
@@ -181,6 +200,16 @@ export default function App() {
         ) : activeView === 'anchors' ? (
           <main className="platform-view-shell">
             <MemoryAnchors anchors={anchors} onChanged={refreshAnchors} />
+          </main>
+        ) : activeView === 'caregiver' ? (
+          <main className="platform-view-shell">
+            <CaregiverDashboard
+              state={platformState}
+              anchorCount={anchors.length}
+              onStateChange={setPlatformState}
+              onStartGame={handleStartGame}
+              onDeleteAll={handleDeleteAll}
+            />
           </main>
         ) : (
           <main className="platform-view placeholder-view">
