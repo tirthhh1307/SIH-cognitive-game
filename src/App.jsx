@@ -16,6 +16,7 @@ import { ConsentGate } from './components/ConsentGate';
 import { getAdaptiveDifficulty, loadPlatformState, recordAttempt, savePlatformState } from './utils/platform';
 import { GameLibrary } from './components/GameLibrary';
 import { GameRunner } from './components/games/GameRunner';
+import { DailyCheckIn } from './components/DailyCheckIn';
 
 export default function App() {
   const [platformState, setPlatformState] = useState(() => loadPlatformState(localStorage));
@@ -160,6 +161,10 @@ export default function App() {
         </main> : activeView === 'play' ? (
           <main className="platform-view-shell">
             <GameLibrary stage={profile.stage} onSelectGame={handleSelectLibraryGame} />
+          </main>
+        ) : activeView === 'check-in' ? (
+          <main className="platform-view-shell">
+            <DailyCheckIn state={platformState} onStateChange={setPlatformState} />
           </main>
         ) : (
           <main className="platform-view placeholder-view">

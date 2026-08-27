@@ -134,3 +134,31 @@ export function clearPlatformData(storage = globalThis.localStorage) {
     return { ok: false, error };
   }
 }
+
+export function addCheckIn(state, checkIn) {
+  if (!checkIn?.id || !/^\d{4}-\d{2}-\d{2}$/.test(checkIn.date) || !['great', 'calm', 'tired', 'worried', 'sad'].includes(checkIn.mood)) {
+    return state;
+  }
+  const previous = state.checkIns.filter(entry => entry.date !== checkIn.date);
+  return { ...state, checkIns: [...previous, checkIn].slice(-90) };
+}
+
+export function upsertReminder(state, reminder) {
+  if (!reminder?.id || !reminder.label?.trim() || !/^([01]\d|2[0-3]):[0-5]\d$/.test(reminder.time)) return state;
+  const normalized = { ...reminder, label: reminder.label.trim(), enabled: Boolean(reminder.enabled) };
+  const index = state.reminders.findIndex(entry => entry.id === reminder.id);
+  const reminders = [...state.reminders];
+  if (index === -1) reminders.push(normalized);
+  else reminders[index] = normalized;
+  return { ...state, reminders };
+}
+
+export function removeReminder(state, reminderId) {
+  return { ...state, reminders: state.reminders.filter(reminder => reminder.id !== reminderId) };
+}
+
+export function getDueReminders(state, now = new Date()) {
+  const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  const date = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
+  return state.reminders.filter(reminder => reminder.enabled && reminder.time === time && reminder.lastShownDate !== date);
+}

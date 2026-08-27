@@ -6,7 +6,11 @@ import {
   recordAttempt,
   getAdaptiveDifficulty,
   getCategorySummaries,
-  getReviewFlags
+  getReviewFlags,
+  addCheckIn,
+  upsertReminder,
+  removeReminder,
+  getDueReminders
 } from '../src/utils/platform.js';
 
 const game = {
@@ -70,4 +74,23 @@ test('saved schema-1 profile merges with defaults', () => {
   assert.equal(state.profile.name, 'Mina');
   assert.equal(state.profile.stage, 'mild');
   assert.equal(state.settings.voice, true);
+});
+
+test('daily check-in replaces same-day record without duplicating it', () => {
+  let state = createInitialState();
+  const first = { id: 'one', date: '2026-08-27', medicine: true, meals: false, walk: false, mood: 'calm', recentEvent: '' };
+  const updated = { ...first, id: 'two', meals: true };
+  state = addCheckIn(state, first);
+  state = addCheckIn(state, updated);
+  assert.equal(state.checkIns.length, 1);
+  assert.equal(state.checkIns[0].id, 'two');
+});
+
+test('due reminders match local HH:MM and enabled status', () => {
+  let state = createInitialState();
+  state = upsertReminder(state, { id: 'meds', label: 'Medicine', time: '09:30', enabled: true });
+  state = upsertReminder(state, { id: 'walk', label: 'Walk', time: '10:00', enabled: false });
+  const due = getDueReminders(state, new Date(2026, 7, 27, 9, 30));
+  assert.deepEqual(due.map(({ id }) => id), ['meds']);
+  assert.equal(removeReminder(state, 'meds').reminders.length, 1);
 });
