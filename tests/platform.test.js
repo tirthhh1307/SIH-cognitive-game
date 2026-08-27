@@ -61,3 +61,13 @@ test('20-point decline after three attempts creates review flag', () => {
   assert.equal(getCategorySummaries(state)[0].recentScore, 50);
   assert.equal(getReviewFlags(state)[0].category, 'working-memory');
 });
+
+test('saved schema-1 profile merges with defaults', () => {
+  const storage = {
+    getItem: () => JSON.stringify({ schemaVersion: 1, profile: { name: 'Mina' } })
+  };
+  const state = loadPlatformState(storage);
+  assert.equal(state.profile.name, 'Mina');
+  assert.equal(state.profile.stage, 'mild');
+  assert.equal(state.settings.voice, true);
+});

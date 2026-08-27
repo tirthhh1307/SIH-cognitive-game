@@ -32,7 +32,19 @@ export function loadPlatformState(storage = globalThis.localStorage) {
     if (!raw) return createInitialState();
     const saved = JSON.parse(raw);
     if (!saved || typeof saved !== 'object' || saved.schemaVersion !== 1) return createInitialState();
-    return { ...createInitialState(), ...saved };
+    const initial = createInitialState();
+    return {
+      ...initial,
+      ...saved,
+      consent: { ...initial.consent, ...(saved.consent ?? {}) },
+      profile: { ...initial.profile, ...(saved.profile ?? {}) },
+      settings: { ...initial.settings, ...(saved.settings ?? {}) },
+      baseline: saved.baseline && typeof saved.baseline === 'object' ? saved.baseline : {},
+      difficultyByGame: saved.difficultyByGame && typeof saved.difficultyByGame === 'object' ? saved.difficultyByGame : {},
+      attempts: Array.isArray(saved.attempts) ? saved.attempts : [],
+      checkIns: Array.isArray(saved.checkIns) ? saved.checkIns : [],
+      reminders: Array.isArray(saved.reminders) ? saved.reminders : []
+    };
   } catch {
     return createInitialState();
   }

@@ -11,27 +11,34 @@ import { MusicJoyModal } from './components/games/MusicJoyModal';
 import { StoriesMemoriesModal } from './components/games/StoriesMemoriesModal';
 import { toggleMute, playStarSound } from './utils/audio';
 import { speakText } from './utils/speech';
+import { AppNav } from './components/AppNav';
+import { ConsentGate } from './components/ConsentGate';
+import { loadPlatformState, savePlatformState } from './utils/platform';
 
 export default function App() {
-  const [playerName, setPlayerName] = useState('Apoi');
-  const [stars, setStars] = useState(120);
+  const [platformState, setPlatformState] = useState(() => loadPlatformState(localStorage));
+  const [activeView, setActiveView] = useState('home');
   const [activeModal, setActiveModal] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [fontSize, setFontSize] = useState('normal');
-  const [highContrast, setHighContrast] = useState(false);
-  const [voiceEnabled, setVoiceEnabledState] = useState(true);
   const [starNotification, setStarNotification] = useState(null);
 
+  const { profile, settings, stars } = platformState;
+  const playerName = profile.name;
+
   useEffect(() => {
+    savePlatformState(platformState, localStorage);
+  }, [platformState]);
+
+  useEffect(() => {
+    if (!platformState.consent.accepted) return undefined;
     const timer = setTimeout(() => {
       speakText(`Welcome, ${playerName}! Let's have a fun and happy day!`);
     }, 1200);
     return () => clearTimeout(timer);
-  }, []);
+  }, [platformState.consent.accepted]);
 
   const handleEarnStars = (amount, reason) => {
-    setStars(prev => prev + amount);
+    setPlatformState(prev => ({ ...prev, stars: prev.stars + amount }));
     playStarSound();
     setStarNotification({ amount, reason });
     setTimeout(() => {
@@ -40,8 +47,8 @@ export default function App() {
   };
 
   const handleToggleMute = () => {
-    const nextMuted = !isMuted;
-    setIsMuted(nextMuted);
+    const nextMuted = !settings.muted;
+    setPlatformState(prev => ({ ...prev, settings: { ...prev.settings, muted: nextMuted } }));
     toggleMute(nextMuted);
   };
 
@@ -89,12 +96,12 @@ export default function App() {
   ];
 
   return (
-    <div className={`app-root font-size-${fontSize} ${highContrast ? 'high-contrast' : ''}`}>
+    <div className={`app-root font-size-${settings.fontSize} ${settings.highContrast ? 'high-contrast' : ''}`}>
       <div className="scenic-backdrop" style={{ backgroundImage: "url('/scenic_bg.jpg')" }}>
         <div className="scenic-lighting-overlay" />
       </div>
 
-      <SceneryInteractive onEarnStars={handleEarnStars} />
+      {activeView === 'home' && <SceneryInteractive onEarnStars={handleEarnStars} />}
 
       <div className="main-game-container">
         <Header 
@@ -102,11 +109,13 @@ export default function App() {
           stars={stars}
           onOpenSettings={() => setShowSettings(true)}
           onOpenProfile={() => setShowSettings(true)}
-          isMuted={isMuted}
+          isMuted={settings.muted}
           onToggleMute={handleToggleMute}
         />
 
-        <main className="categories-grid-section">
+        <AppNav activeView={activeView} onNavigate={setActiveView} />
+
+        {activeView === 'home' ? <main className="categories-grid-section">
           <div className="categories-grid">
             {categoryCards.map((card) => (
               <CategoryCard 
@@ -121,7 +130,13 @@ export default function App() {
               />
             ))}
           </div>
-        </main>
+        </main> : (
+          <main className="platform-view placeholder-view">
+            <p className="eyebrow">Offline cognitive companion</p>
+            <h2>{activeView === 'play' ? 'Game Library' : activeView === 'check-in' ? 'Daily Check-in' : activeView === 'anchors' ? 'Memory Anchors' : 'Caregiver Dashboard'}</h2>
+            <p>This section is ready for the next feature.</p>
+          </main>
+        )}
 
         <footer className="footer-banner-section">
           <BottomBanner />
@@ -156,15 +171,22 @@ export default function App() {
         <SettingsModal 
           onClose={() => setShowSettings(false)}
           playerName={playerName}
-          setPlayerName={setPlayerName}
-          fontSize={fontSize}
-          setFontSize={setFontSize}
-          highContrast={highContrast}
-          setHighContrast={setHighContrast}
-          voiceEnabled={voiceEnabled}
-          setVoiceEnabledState={setVoiceEnabledState}
+          setPlayerName={(name) => setPlatformState(prev => ({ ...prev, profile: { ...prev.profile, name } }))}
+          fontSize={settings.fontSize}
+          setFontSize={(fontSize) => setPlatformState(prev => ({ ...prev, settings: { ...prev.settings, fontSize } }))}
+          highContrast={settings.highContrast}
+          setHighContrast={(highContrast) => setPlatformState(prev => ({ ...prev, settings: { ...prev.settings, highContrast } }))}
+          voiceEnabled={settings.voice}
+          setVoiceEnabledState={(voice) => setPlatformState(prev => ({ ...prev, settings: { ...prev.settings, voice } }))}
           stars={stars}
         />
+      )}
+
+      {!platformState.consent.accepted && (
+        <ConsentGate onAccept={() => setPlatformState(prev => ({
+          ...prev,
+          consent: { accepted: true, acceptedAt: new Date().toISOString() }
+        }))} />
       )}
     </div>
   );
