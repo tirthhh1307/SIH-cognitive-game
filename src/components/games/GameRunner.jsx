@@ -49,7 +49,7 @@ function MatchGame({ game, stage, difficulty, onFinish }) {
       {deck.map(card => {
         const shown = open.includes(card.key) || matched.includes(card.id);
         return <button key={card.key} className={`runner-match-card ${shown ? 'shown' : ''}`} onClick={() => select(card)} aria-label={shown ? card.label : 'Hidden card'}>
-          {shown ? <><span>{card.symbol}</span><small>{card.label}</small></> : <span aria-hidden="true">?</span>}
+          {shown ? <>{card.photoUrl ? <img src={card.photoUrl} alt="" /> : <span>{card.symbol}</span>}<small>{card.label}</small></> : <span aria-hidden="true">?</span>}
         </button>;
       })}
     </div>
@@ -131,7 +131,7 @@ function RecallGame({ game, stage, onFinish }) {
     else { setRoundIndex(value => value + 1); setStudying(true); }
   };
   return <div className="recall-runner">
-    {studying ? <div className="study-card"><Eye size={28} /><h3>Take your time</h3><div className="study-items">{round.shown.map(item => <span key={item}>{item}</span>)}</div><button className="game-primary-btn" onClick={() => setStudying(false)}>I&apos;m ready</button></div>
+    {studying ? <div className="study-card"><Eye size={28} /><h3>Take your time</h3><div className="study-items">{round.shown.map((item, index) => typeof item === 'string' ? <span key={item}>{item}</span> : <span key={index}>{item.photoUrl && <img src={item.photoUrl} alt="" />}{item.label}</span>)}</div><button className="game-primary-btn" onClick={() => setStudying(false)}>I&apos;m ready</button></div>
       : <div className="runner-prompt"><h3>{round.prompt}</h3><div className="runner-choice-grid">{choices.map((label, index) => <button key={label} onClick={() => choose(index)}>{label}</button>)}</div></div>}
   </div>;
 }
@@ -147,7 +147,8 @@ function ChoiceGame({ game, stage, onFinish, audio = false }) {
   const correctIndex = typeof round.correct === 'number' ? round.correct : options.findIndex(({ id }) => id === round.correct);
 
   const playSound = () => {
-    if (round.sound === 'dhol-low') playDrumBeat('low');
+    if (round.soundUrl) new Audio(round.soundUrl).play().catch(() => speakText(round.prompt));
+    else if (round.sound === 'dhol-low') playDrumBeat('low');
     else if (round.sound === 'dhol-high') playDrumBeat('high');
     else if (round.sound === 'xylophone') [261.63, 329.63, 392].forEach((note, index) => setTimeout(() => playXylophoneNote(note), index * 180));
     else speakText(round.prompt);
@@ -210,16 +211,53 @@ function ActionGame({ game, stage, onFinish }) {
   return <div className={`target-runner ${stage === 'severe' ? 'runner-large-targets' : ''}`}><h3>{round.prompt}</h3><div className="target-grid">{Array.from({ length: 9 }, (_, index) => <button key={index} onClick={() => advance(index === position)}>{index === position ? round.target : round.distractors[index % round.distractors.length]}</button>)}</div></div>;
 }
 
-export function GameRunner({ game, stage, difficulty, playerName, together, onComplete, onClose }) {
+export function GameRunner({ game, stage, difficulty, playerName, together, anchors = [], onComplete, onClose }) {
   const startedAt = useRef(Date.now());
   const [result, setResult] = useState(null);
+  const mediaUrls = useMemo(() => anchors.flatMap(anchor => [
+    anchor.photoBlob ? { id: `${anchor.id}-photo`, url: URL.createObjectURL(anchor.photoBlob) } : null,
+    anchor.audioBlob ? { id: `${anchor.id}-audio`, url: URL.createObjectURL(anchor.audioBlob) } : null
+  ].filter(Boolean)), [anchors]);
+  const personalizedGame = useMemo(() => {
+    const photoAnchors = anchors.filter(anchor => anchor.photoBlob);
+    const audioAnchors = anchors.filter(anchor => anchor.audioBlob);
+    if (game.id === 'family-face-match' && photoAnchors.length >= 2) return {
+      ...game,
+      content: { ...game.content, pairs: photoAnchors.map(anchor => ({ id: anchor.id, label: `${anchor.name} — ${anchor.relationship}`, symbol: '', photoUrl: mediaUrls.find(url => url.id === `${anchor.id}-photo`)?.url })) }
+    };
+    if (game.id === 'voice-recognition' && audioAnchors.length >= 2) return {
+      ...game,
+      content: { ...game.content, rounds: audioAnchors.map(anchor => ({ prompt: 'Who is speaking?', soundUrl: mediaUrls.find(url => url.id === `${anchor.id}-audio`)?.url, choices: audioAnchors.slice(0, 3).map(({ name, relationship }) => `${name} — ${relationship}`), correct: audioAnchors.slice(0, 3).findIndex(({ id }) => id === anchor.id) })).filter(round => round.correct >= 0) }
+    };
+    if (game.id === 'family-tree' && anchors.length >= 3) return {
+      ...game,
+      content: {
+        ...game.content,
+        items: anchors.map(anchor => {
+          const relation = anchor.relationship.toLowerCase();
+          const target = relation.includes('grand') ? 'grandchild'
+            : /mother|father|parent|maa|deuta/.test(relation) ? 'parent'
+            : 'child';
+          return { id: anchor.id, label: anchor.name, symbol: '👤', target };
+        })
+      }
+    };
+    if (game.id === 'photo-diary' && photoAnchors.length >= 1) return {
+      ...game,
+      content: { ...game.content, rounds: photoAnchors.slice(0, 3).map(anchor => ({ shown: [{ label: `${anchor.name} — ${anchor.relationship}`, photoUrl: mediaUrls.find(url => url.id === `${anchor.id}-photo`)?.url }], prompt: 'Who is shown in this memory?', choices: photoAnchors.slice(0, 3).map(({ name }) => name), correct: photoAnchors.slice(0, 3).findIndex(({ id }) => id === anchor.id) })).filter(round => round.correct >= 0) }
+    };
+    return game;
+  }, [anchors, game, mediaUrls]);
+  const usingDemo = Boolean(game.content.source) && personalizedGame === game;
 
   useEffect(() => {
-    speakText(game.instructions);
+    speakText(personalizedGame.instructions);
     const closeOnEscape = event => { if (event.key === 'Escape') onClose(); };
     window.addEventListener('keydown', closeOnEscape);
     return () => { window.removeEventListener('keydown', closeOnEscape); stopSpeaking(); };
-  }, [game.id, onClose]);
+  }, [personalizedGame.id, onClose, mediaUrls]);
+
+  useEffect(() => () => mediaUrls.forEach(({ url }) => URL.revokeObjectURL(url)), [mediaUrls]);
 
   const finish = (correct, total, hints) => {
     if (result) return;
@@ -232,14 +270,14 @@ export function GameRunner({ game, stage, difficulty, playerName, together, onCo
     onComplete(completed);
   };
 
-  const props = { game, stage, difficulty, onFinish: finish };
-  const engine = game.engine === 'match' ? <MatchGame {...props} />
-    : game.engine === 'sequence' ? <SequenceGame {...props} />
-    : game.engine === 'recall' ? <RecallGame {...props} />
-    : game.engine === 'choice' ? <ChoiceGame {...props} />
-    : game.engine === 'sorting' ? <SortingGame {...props} />
-    : game.engine === 'audio' ? <ChoiceGame {...props} audio />
-    : game.engine === 'action' ? <ActionGame {...props} />
+  const props = { game: personalizedGame, stage, difficulty, onFinish: finish };
+  const engine = personalizedGame.engine === 'match' ? <MatchGame {...props} />
+    : personalizedGame.engine === 'sequence' ? <SequenceGame {...props} />
+    : personalizedGame.engine === 'recall' ? <RecallGame {...props} />
+    : personalizedGame.engine === 'choice' ? <ChoiceGame {...props} />
+    : personalizedGame.engine === 'sorting' ? <SortingGame {...props} />
+    : personalizedGame.engine === 'audio' ? <ChoiceGame {...props} audio />
+    : personalizedGame.engine === 'action' ? <ActionGame {...props} />
     : <div className="empty-state"><h3>This game mode is unavailable.</h3></div>;
 
   return <div className="game-modal-backdrop" onClick={onClose}>
@@ -248,7 +286,8 @@ export function GameRunner({ game, stage, difficulty, playerName, together, onCo
         <div className="modal-title-group"><span className="modal-badge-icon">🧠</span><div><h2 className="modal-title" id="runner-title">{game.name}</h2><p className="modal-subtitle">{together && <><Users size={15} /> Together mode · </>}{stage} · level {difficulty}</p></div></div>
         <button className="modal-close-btn" onClick={onClose} aria-label="Close game"><X size={24} /></button>
       </header>
-      <div className="runner-instructions">{game.instructions}</div>
+      <div className="runner-instructions">{personalizedGame.instructions}</div>
+      {usingDemo && <div className="demo-content-note">Using demo family memories—add your own in Memory Anchors.</div>}
       <div className="game-content runner-content">
         {result ? <div className="runner-complete"><span>⭐</span><h3>{together ? 'Wonderful teamwork!' : 'Round complete!'}</h3><p>{result.accuracy}% accuracy · {result.hints} hints</p><button className="game-primary-btn" onClick={onClose}>Back to library</button></div> : engine}
       </div>

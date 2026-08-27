@@ -17,6 +17,8 @@ import { getAdaptiveDifficulty, loadPlatformState, recordAttempt, savePlatformSt
 import { GameLibrary } from './components/GameLibrary';
 import { GameRunner } from './components/games/GameRunner';
 import { DailyCheckIn } from './components/DailyCheckIn';
+import { MemoryAnchors } from './components/MemoryAnchors';
+import { listAnchors } from './utils/mediaStore';
 
 export default function App() {
   const [platformState, setPlatformState] = useState(() => loadPlatformState(localStorage));
@@ -26,6 +28,7 @@ export default function App() {
   const [starNotification, setStarNotification] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
   const [togetherMode, setTogetherMode] = useState(false);
+  const [anchors, setAnchors] = useState([]);
 
   const { profile, settings, stars } = platformState;
   const playerName = profile.name;
@@ -33,6 +36,15 @@ export default function App() {
   useEffect(() => {
     savePlatformState(platformState, localStorage);
   }, [platformState]);
+
+  const refreshAnchors = async () => {
+    try { setAnchors(await listAnchors()); }
+    catch { setAnchors([]); }
+  };
+
+  useEffect(() => {
+    if (platformState.consent.accepted) refreshAnchors();
+  }, [platformState.consent.accepted]);
 
   useEffect(() => {
     if (!platformState.consent.accepted) return undefined;
@@ -166,6 +178,10 @@ export default function App() {
           <main className="platform-view-shell">
             <DailyCheckIn state={platformState} onStateChange={setPlatformState} />
           </main>
+        ) : activeView === 'anchors' ? (
+          <main className="platform-view-shell">
+            <MemoryAnchors anchors={anchors} onChanged={refreshAnchors} />
+          </main>
         ) : (
           <main className="platform-view placeholder-view">
             <p className="eyebrow">Offline cognitive companion</p>
@@ -225,6 +241,7 @@ export default function App() {
           difficulty={getAdaptiveDifficulty(platformState, selectedGame, profile.stage)}
           playerName={playerName}
           together={togetherMode}
+          anchors={anchors}
           onComplete={handleLibraryComplete}
           onClose={() => setSelectedGame(null)}
         />

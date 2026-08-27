@@ -125,6 +125,13 @@
 @media (max-width: 900px) { .support-grid { grid-template-columns: 1fr; } }
 @media (max-width: 760px) { .support-view { max-height: none; padding: 16px; }.daily-checks { grid-template-columns: 1fr; }.mood-options { grid-template-columns: repeat(3, 1fr); }.reminder-form { grid-template-columns: 1fr 105px 44px; } }
 
+.local-only-badge { display: inline-flex; align-items: center; gap: 6px; }
+.anchor-layout { display: grid; grid-template-columns: minmax(300px, .8fr) minmax(380px, 1.2fr); gap: 16px; margin-top: 20px; }
+.anchor-form { align-self: start; }.file-field { position: relative; display: flex; align-items: center; gap: 12px; margin: 12px 0; padding: 14px; border: 2px dashed #a9bca9; border-radius: 14px; color: #2e5e36; background: #f6fbf6; cursor: pointer; }.file-field span { display: grid; }.file-field small { color: #64748b; }.file-field input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.anchor-list-panel { padding: 20px; border: 2px solid #e1e9e2; border-radius: 21px; background: #f8fbf8; }.anchor-list { display: grid; gap: 10px; margin-top: 14px; }.anchor-card { display: grid; grid-template-columns: 72px 1fr 38px; align-items: center; gap: 12px; padding: 11px; border-radius: 16px; background: #fff; box-shadow: 0 4px 12px rgba(15,23,42,.07); }.anchor-photo { width: 72px; height: 72px; display: grid; place-items: center; overflow: hidden; border-radius: 16px; color: #2e7d32; background: #e8f5e9; }.anchor-photo img { width: 100%; height: 100%; object-fit: cover; }.anchor-info p, .anchor-info small { color: #64748b; }.anchor-info audio { display: block; width: min(260px, 100%); height: 34px; margin-top: 5px; }.error-message { margin-top: 10px; color: #b91c1c; font-weight: 800; }
+.runner-match-card img { width: 62px; height: 62px; object-fit: cover; border-radius: 12px; }.study-items img { width: 130px; height: 100px; display: block; margin-bottom: 7px; object-fit: cover; border-radius: 12px; }.demo-content-note { padding: 9px 26px; color: #6b4f00; background: #fff8dc; border-bottom: 1px solid #f2cf66; font-size: 13px; font-weight: 800; }
+@media (max-width: 850px) { .anchor-layout { grid-template-columns: 1fr; } }
+
 .platform-view-shell { width: 100%; }
 .game-library { max-height: calc(100vh - 235px); overflow: auto; padding: 22px; border-radius: 28px; background: rgba(255, 253, 248, .96); box-shadow: var(--card-shadow); }
 .view-heading { display: flex; justify-content: space-between; gap: 24px; align-items: center; }
