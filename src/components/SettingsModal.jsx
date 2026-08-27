@@ -1,0 +1,212 @@
+import React, { useState } from 'react';
+import { X, Volume2, Eye, Type, User, Sparkles, Check, Play, Square } from 'lucide-react';
+import { playClickSound, setSoundVolume, setNatureVolume, startNatureAmbience, stopNatureAmbience } from '../utils/audio';
+import { setVoiceEnabled, speakText } from '../utils/speech';
+
+export function SettingsModal({
+  onClose,
+  playerName,
+  setPlayerName,
+  fontSize,
+  setFontSize,
+  highContrast,
+  setHighContrast,
+  voiceEnabled,
+  setVoiceEnabledState,
+  stars
+}) {
+  const [sfxVol, setSfxVol] = useState(80);
+  const [natureVol, setNatureVolState] = useState(50);
+  const [isNatureRunning, setIsNatureRunning] = useState(false);
+  const [tempName, setTempName] = useState(playerName);
+
+  const handleSfxChange = (e) => {
+    const val = Number(e.target.value);
+    setSfxVol(val);
+    setSoundVolume(val / 100);
+  };
+
+  const handleNatureChange = (e) => {
+    const val = Number(e.target.value);
+    setNatureVolState(val);
+    setNatureVolume(val / 100);
+  };
+
+  const handleToggleNature = () => {
+    playClickSound();
+    if (isNatureRunning) {
+      stopNatureAmbience();
+      setIsNatureRunning(false);
+    } else {
+      startNatureAmbience();
+      setIsNatureRunning(true);
+    }
+  };
+
+  const handleVoiceToggle = () => {
+    playClickSound();
+    const nextVal = !voiceEnabled;
+    setVoiceEnabledState(nextVal);
+    setVoiceEnabled(nextVal);
+    if (nextVal) {
+      speakText("Voice assistance is now turned on. Welcome!");
+    }
+  };
+
+  const handleSaveProfile = (e) => {
+    e.preventDefault();
+    if (tempName.trim()) {
+      setPlayerName(tempName.trim());
+      playClickSound();
+      speakText(`Welcome, ${tempName.trim()}!`);
+    }
+  };
+
+  return (
+    <div className="game-modal-backdrop" onClick={onClose}>
+      <div className="settings-modal-card" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <div className="modal-title-group">
+            <span className="modal-badge-icon">⚙️</span>
+            <div>
+              <h2 className="modal-title">Settings & Accessibility</h2>
+              <p className="modal-subtitle">Customize audio, text size, and preferences</p>
+            </div>
+          </div>
+          <button className="modal-close-btn" onClick={onClose} aria-label="Close">
+            <X size={24} />
+          </button>
+        </div>
+
+        <div className="settings-body">
+          <div className="settings-section">
+            <h3 className="section-heading">
+              <User size={20} /> Player Profile
+            </h3>
+            <form onSubmit={handleSaveProfile} className="profile-edit-row">
+              <input 
+                type="text" 
+                value={tempName} 
+                onChange={e => setTempName(e.target.value)}
+                placeholder="Enter player name"
+                className="name-input"
+                maxLength={20}
+              />
+              <button type="submit" className="save-name-btn">
+                <Check size={18} /> Update
+              </button>
+            </form>
+          </div>
+
+          <div className="settings-section">
+            <h3 className="section-heading">
+              <Volume2 size={20} /> Sound & Music
+            </h3>
+            
+            <div className="control-row">
+              <label>Game Sound Effects ({sfxVol}%)</label>
+              <input 
+                type="range" 
+                min="0" 
+                max="100" 
+                value={sfxVol} 
+                onChange={handleSfxChange} 
+                className="range-slider"
+              />
+            </div>
+
+            <div className="control-row">
+              <label>Nature River Stream ({natureVol}%)</label>
+              <div className="nature-slider-group">
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="100" 
+                  value={natureVol} 
+                  onChange={handleNatureChange} 
+                  className="range-slider"
+                />
+                <button 
+                  type="button" 
+                  className={`ambient-toggle-btn ${isNatureRunning ? 'active' : ''}`}
+                  onClick={handleToggleNature}
+                >
+                  {isNatureRunning ? <Square size={16} /> : <Play size={16} />}
+                  {isNatureRunning ? "Stop Stream" : "Play Stream"}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="settings-section">
+            <h3 className="section-heading">
+              <Eye size={20} /> Accessibility
+            </h3>
+
+            <div className="toggle-row">
+              <div>
+                <strong>Voice Assistance (Read Aloud)</strong>
+                <p className="toggle-desc">Speaks instructions and stories aloud automatically</p>
+              </div>
+              <button 
+                type="button" 
+                className={`switch-toggle ${voiceEnabled ? 'on' : 'off'}`}
+                onClick={handleVoiceToggle}
+              >
+                <div className="toggle-handle"></div>
+              </button>
+            </div>
+
+            <div className="toggle-row">
+              <div>
+                <strong>High Contrast Mode</strong>
+                <p className="toggle-desc">Enhances text borders and color contrast for easy reading</p>
+              </div>
+              <button 
+                type="button" 
+                className={`switch-toggle ${highContrast ? 'on' : 'off'}`}
+                onClick={() => {
+                  playClickSound();
+                  setHighContrast(!highContrast);
+                }}
+              >
+                <div className="toggle-handle"></div>
+              </button>
+            </div>
+
+            <div className="font-size-row">
+              <label><Type size={18} /> Text Size:</label>
+              <div className="font-buttons-group">
+                <button 
+                  className={`font-opt-btn ${fontSize === 'normal' ? 'selected' : ''}`}
+                  onClick={() => { playClickSound(); setFontSize('normal'); }}
+                >
+                  Normal
+                </button>
+                <button 
+                  className={`font-opt-btn ${fontSize === 'large' ? 'selected' : ''}`}
+                  onClick={() => { playClickSound(); setFontSize('large'); }}
+                >
+                  Large (A+)
+                </button>
+                <button 
+                  className={`font-opt-btn ${fontSize === 'xl' ? 'selected' : ''}`}
+                  onClick={() => { playClickSound(); setFontSize('xl'); }}
+                >
+                  Extra Large (A++)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="settings-section">
+            <h3 className="section-heading">
+              <Sparkles size={20} /> Star Collection ({stars} Stars)
+            </h3>
+            <p className="stars-summary">You are doing fantastic! Keep playing daily to grow your garden and mind.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
