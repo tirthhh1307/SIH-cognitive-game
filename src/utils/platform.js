@@ -20,7 +20,9 @@ export function createInitialState() {
       muted: false,
       voice: true,
       fontSize: 'normal',
-      highContrast: false
+      highContrast: false,
+      scenicBackgroundIndex: 0,
+      scenicAutoSlide: true
     },
     difficultyByGame: {},
     reportsExported: 0

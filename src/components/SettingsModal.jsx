@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { X, Volume2, Eye, Type, User, Sparkles, Check, Play, Square, Languages } from 'lucide-react';
+import { X, Volume2, Eye, Type, User, Sparkles, Check, Play, Square, Languages, Image as ImageIcon } from 'lucide-react';
 import { playClickSound, setSoundVolume, setNatureVolume, startNatureAmbience, stopNatureAmbience } from '../utils/audio';
 import { setVoiceEnabled, speakText } from '../utils/speech';
 import { LANGUAGES } from '../data/i18n';
+import { SCENIC_BACKGROUNDS } from '../data/scenicBackgrounds';
 
 export function SettingsModal({
   onClose,
@@ -16,7 +17,11 @@ export function SettingsModal({
   setVoiceEnabledState,
   stars,
   language,
-  setLanguage
+  setLanguage,
+  scenicBackgroundIndex = 0,
+  setScenicBackgroundIndex,
+  scenicAutoSlide = true,
+  setScenicAutoSlide
 }) {
   const [sfxVol, setSfxVol] = useState(80);
   const [natureVol, setNatureVolState] = useState(50);
@@ -209,6 +214,58 @@ export function SettingsModal({
                   Extra Large (A++)
                 </button>
               </div>
+            </div>
+          </div>
+
+          <div className="settings-section">
+            <h3 className="section-heading">
+              <ImageIcon size={20} /> {language === 'as' ? 'প্ৰাকৃতিক পটভূমি (Scenic Views)' : 'Scenic Backgrounds'}
+            </h3>
+            
+            <div className="toggle-row" style={{ marginBottom: '14px' }}>
+              <div>
+                <strong>{language === 'as' ? 'স্বয়ংক্রিয় দৃশ্য সলনি (Auto-Cycle)' : 'Auto-Cycle Peaceful Backgrounds (Default)'}</strong>
+                <p className="toggle-desc">
+                  {language === 'as' ? 'শান্ত দৃশ্যসমূহ নিজে নিজে মসৃণভাৱে সলনি হৈ থাকিব' : 'Automatically rotates through all 6 scenic views with smooth, peaceful crossfades'}
+                </p>
+              </div>
+              <button 
+                type="button" 
+                className={`switch-toggle ${scenicAutoSlide ? 'on' : 'off'}`}
+                onClick={() => {
+                  playClickSound();
+                  if (setScenicAutoSlide) setScenicAutoSlide(!scenicAutoSlide);
+                }}
+                aria-label="Toggle scenic background auto cycle"
+              >
+                <div className="toggle-handle"></div>
+              </button>
+            </div>
+
+            <p className="toggle-desc" style={{ marginBottom: '8px' }}>
+              {language === 'as' ? 'অথবা এটা নিৰ্দিষ্ট দৃশ্য বাছি লওক:' : 'Or choose a specific scenic view:'}
+            </p>
+            <div className="scenic-settings-grid">
+              {SCENIC_BACKGROUNDS.map((bg, idx) => {
+                const isSelected = idx === scenicBackgroundIndex;
+                const bgTitle = language === 'as' && bg.nameAs ? bg.nameAs : bg.name;
+                return (
+                  <button
+                    key={bg.id}
+                    type="button"
+                    className={`scenic-choice-card ${isSelected ? 'selected' : ''}`}
+                    onClick={() => {
+                      playClickSound();
+                      if (setScenicBackgroundIndex) setScenicBackgroundIndex(idx);
+                    }}
+                  >
+                    <div className="scenic-choice-thumb" style={{ backgroundImage: `url('${bg.url}')` }}>
+                      {isSelected && <span className="scenic-choice-check"><Check size={14} /></span>}
+                    </div>
+                    <span className="scenic-choice-title">{bgTitle}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 

@@ -3,6 +3,8 @@ import { Header } from './components/Header';
 import { CategoryCard } from './components/CategoryCard';
 import { BottomBanner } from './components/BottomBanner';
 import { SceneryInteractive } from './components/SceneryInteractive';
+import { ScenicBackdrop } from './components/ScenicBackdrop';
+import { SCENIC_BACKGROUNDS } from './data/scenicBackgrounds';
 import { SettingsModal } from './components/SettingsModal';
 import { BrainSunburstIcon, SproutGardenIcon, MusicNotesIcon, PhotoMemoryIcon } from './components/CardIcons';
 import { MindGamesModal } from './components/games/MindGamesModal';
@@ -135,6 +137,50 @@ export default function App() {
     setTimeout(() => setStarNotification(null), 3000);
   };
 
+  const scenicBgIndex = platformState.settings.scenicBackgroundIndex ?? 0;
+  const scenicAutoSlide = platformState.settings.scenicAutoSlide ?? true;
+
+  const handleScenicBgChange = (nextIndex) => {
+    const safeIdx = typeof nextIndex === 'function' ? nextIndex(scenicBgIndex) : nextIndex;
+    setPlatformState(prev => ({
+      ...prev,
+      settings: {
+        ...prev.settings,
+        scenicBackgroundIndex: safeIdx
+      }
+    }));
+  };
+
+  const handleScenicAutoSlideToggle = (enabled) => {
+    setPlatformState(prev => ({
+      ...prev,
+      settings: {
+        ...prev.settings,
+        scenicAutoSlide: enabled
+      }
+    }));
+  };
+
+  // Auto-cycle peaceful scenic backgrounds if auto mode is on (default: ON)
+  useEffect(() => {
+    if (!scenicAutoSlide) return undefined;
+    const interval = setInterval(() => {
+      setPlatformState(prev => {
+        const total = SCENIC_BACKGROUNDS.length;
+        const currentIdx = prev.settings?.scenicBackgroundIndex ?? 0;
+        const nextIdx = (currentIdx + 1) % total;
+        return {
+          ...prev,
+          settings: {
+            ...prev.settings,
+            scenicBackgroundIndex: nextIdx
+          }
+        };
+      });
+    }, 16000);
+    return () => clearInterval(interval);
+  }, [scenicAutoSlide]);
+
   const categoryCards = [
     {
       id: 'mind-games',
@@ -172,9 +218,7 @@ export default function App() {
 
   return (
     <div className={`app-root font-size-${settings.fontSize} ${settings.highContrast ? 'high-contrast' : ''}`}>
-      <div className="scenic-backdrop" style={{ backgroundImage: "url('/scenic_bg.jpg')" }}>
-        <div className="scenic-lighting-overlay" />
-      </div>
+      <ScenicBackdrop activeIndex={scenicBgIndex} />
 
       {activeView === 'home' && <SceneryInteractive onEarnStars={handleEarnStars} />}
 
@@ -190,22 +234,24 @@ export default function App() {
 
         <AppNav activeView={activeView} onNavigate={setActiveView} language={language} />
 
-        {activeView === 'home' ? <main className="categories-grid-section">
-          <div className="categories-grid">
-            {categoryCards.map((card) => (
-              <CategoryCard 
-                key={card.id}
-                id={card.id}
-                title={card.title}
-                description={card.description}
-                icon={card.icon}
-                gradientClass={card.gradientClass}
-                arrowColor={card.arrowColor}
-                onClick={handleOpenGame}
-              />
-            ))}
-          </div>
-        </main> : activeView === 'play' ? (
+        {activeView === 'home' ? (
+          <main className="categories-grid-section">
+            <div className="categories-grid">
+              {categoryCards.map((card) => (
+                <CategoryCard 
+                  key={card.id}
+                  id={card.id}
+                  title={card.title}
+                  description={card.description}
+                  icon={card.icon}
+                  gradientClass={card.gradientClass}
+                  arrowColor={card.arrowColor}
+                  onClick={handleOpenGame}
+                />
+              ))}
+            </div>
+          </main>
+        ) : activeView === 'play' ? (
           <main className="platform-view-shell">
             <GameLibrary stage={profile.stage} onSelectGame={handleSelectLibraryGame} language={language} />
           </main>
@@ -279,6 +325,10 @@ export default function App() {
           stars={stars}
           language={language}
           setLanguage={(language) => setPlatformState(prev => ({ ...prev, profile: { ...prev.profile, language } }))}
+          scenicBackgroundIndex={scenicBgIndex}
+          setScenicBackgroundIndex={handleScenicBgChange}
+          scenicAutoSlide={scenicAutoSlide}
+          setScenicAutoSlide={handleScenicAutoSlideToggle}
         />
       )}
 
