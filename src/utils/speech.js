@@ -11,7 +11,7 @@ export function getVoiceEnabled() {
   return isVoiceEnabled;
 }
 
-export function speakText(text, onEnd = null) {
+export function speakText(text, onEnd = null, language = 'en') {
   if (!isVoiceEnabled || !('speechSynthesis' in window)) {
     if (onEnd) onEnd();
     return;
@@ -22,9 +22,11 @@ export function speakText(text, onEnd = null) {
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.rate = 0.88;
   utterance.pitch = 1.05;
+  utterance.lang = language === 'as' ? 'as-IN' : 'en-IN';
 
   const voices = window.speechSynthesis.getVoices();
-  const preferredVoice = voices.find(v => 
+  const languageVoice = voices.find(v => v.lang.toLowerCase().startsWith(language === 'as' ? 'as' : 'en'));
+  const preferredVoice = languageVoice || voices.find(v =>
     (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Karen') || v.name.includes('Zira')) && v.lang.startsWith('en')
   ) || voices.find(v => v.lang.startsWith('en'));
 

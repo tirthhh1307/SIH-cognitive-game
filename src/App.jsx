@@ -11,27 +11,69 @@ import { MusicJoyModal } from './components/games/MusicJoyModal';
 import { StoriesMemoriesModal } from './components/games/StoriesMemoriesModal';
 import { toggleMute, playStarSound } from './utils/audio';
 import { speakText } from './utils/speech';
+import { AppNav } from './components/AppNav';
+import { ConsentGate } from './components/ConsentGate';
+import { clearPlatformData, createInitialState, getAdaptiveDifficulty, loadPlatformState, recordAttempt, savePlatformState } from './utils/platform';
+import { GameLibrary } from './components/GameLibrary';
+import { GameRunner } from './components/games/GameRunner';
+import { DailyCheckIn } from './components/DailyCheckIn';
+import { MemoryAnchors } from './components/MemoryAnchors';
+import { clearAnchors, listAnchors } from './utils/mediaStore';
+import { CaregiverDashboard } from './components/CaregiverDashboard';
+import { getGame } from './data/games';
 
 export default function App() {
-  const [playerName, setPlayerName] = useState('Apoi');
-  const [stars, setStars] = useState(120);
+  const [platformState, setPlatformState] = useState(() => loadPlatformState(localStorage));
+  const [activeView, setActiveView] = useState('home');
   const [activeModal, setActiveModal] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [fontSize, setFontSize] = useState('normal');
-  const [highContrast, setHighContrast] = useState(false);
-  const [voiceEnabled, setVoiceEnabledState] = useState(true);
   const [starNotification, setStarNotification] = useState(null);
+  const [selectedGame, setSelectedGame] = useState(null);
+  const [togetherMode, setTogetherMode] = useState(false);
+  const [anchors, setAnchors] = useState([]);
+
+  const { profile, settings, stars } = platformState;
+  const playerName = profile.name;
+  const language = profile.language;
 
   useEffect(() => {
+    document.documentElement.lang = language === 'as' ? 'as' : 'en';
+  }, [language]);
+
+  useEffect(() => {
+    savePlatformState(platformState, localStorage);
+  }, [platformState]);
+
+  const refreshAnchors = async () => {
+    try { setAnchors(await listAnchors()); }
+    catch { setAnchors([]); }
+  };
+
+  useEffect(() => {
+    if (platformState.consent.accepted) refreshAnchors();
+  }, [platformState.consent.accepted]);
+
+  useEffect(() => {
+    if (!platformState.consent.accepted) return undefined;
     const timer = setTimeout(() => {
-      speakText(`Welcome, ${playerName}! Let's have a fun and happy day!`);
+      speakText(`Welcome, ${playerName}! Let's have a fun and happy day!`, null, language);
     }, 1200);
     return () => clearTimeout(timer);
+  }, [platformState.consent.accepted, language]);
+
+  useEffect(() => {
+    const closeOnEscape = event => {
+      if (event.key !== 'Escape') return;
+      setActiveModal(null);
+      setShowSettings(false);
+      setSelectedGame(null);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
   }, []);
 
   const handleEarnStars = (amount, reason) => {
-    setStars(prev => prev + amount);
+    setPlatformState(prev => ({ ...prev, stars: prev.stars + amount }));
     playStarSound();
     setStarNotification({ amount, reason });
     setTimeout(() => {
@@ -40,8 +82,8 @@ export default function App() {
   };
 
   const handleToggleMute = () => {
-    const nextMuted = !isMuted;
-    setIsMuted(nextMuted);
+    const nextMuted = !settings.muted;
+    setPlatformState(prev => ({ ...prev, settings: { ...prev.settings, muted: nextMuted } }));
     toggleMute(nextMuted);
   };
 
@@ -51,6 +93,46 @@ export default function App() {
 
   const handleCloseModal = () => {
     setActiveModal(null);
+  };
+
+  const handleSelectLibraryGame = (game, together) => {
+    setSelectedGame(game);
+    setTogetherMode(together);
+  };
+
+  const handleStartGame = gameId => {
+    const game = getGame(gameId);
+    if (game) {
+      setTogetherMode(false);
+      setSelectedGame(game);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    clearPlatformData(localStorage);
+    try { await clearAnchors(); } catch {}
+    setAnchors([]);
+    setSelectedGame(null);
+    setActiveView('home');
+    setPlatformState(createInitialState());
+  };
+
+  const handleLibraryComplete = result => {
+    const earnedStars = 5 + Math.round(result.accuracy / 10);
+    setPlatformState(prev => recordAttempt(prev, {
+      id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${selectedGame.id}`,
+      gameId: selectedGame.id,
+      category: selectedGame.category,
+      stage: profile.stage,
+      difficulty: getAdaptiveDifficulty(prev, selectedGame, profile.stage),
+      ...result,
+      earnedStars,
+      together: togetherMode,
+      completedAt: new Date().toISOString()
+    }));
+    playStarSound();
+    setStarNotification({ amount: earnedStars, reason: `Completed ${selectedGame.name}!` });
+    setTimeout(() => setStarNotification(null), 3000);
   };
 
   const categoryCards = [
@@ -89,12 +171,12 @@ export default function App() {
   ];
 
   return (
-    <div className={`app-root font-size-${fontSize} ${highContrast ? 'high-contrast' : ''}`}>
+    <div className={`app-root font-size-${settings.fontSize} ${settings.highContrast ? 'high-contrast' : ''}`}>
       <div className="scenic-backdrop" style={{ backgroundImage: "url('/scenic_bg.jpg')" }}>
         <div className="scenic-lighting-overlay" />
       </div>
 
-      <SceneryInteractive onEarnStars={handleEarnStars} />
+      {activeView === 'home' && <SceneryInteractive onEarnStars={handleEarnStars} />}
 
       <div className="main-game-container">
         <Header 
@@ -102,11 +184,13 @@ export default function App() {
           stars={stars}
           onOpenSettings={() => setShowSettings(true)}
           onOpenProfile={() => setShowSettings(true)}
-          isMuted={isMuted}
+          isMuted={settings.muted}
           onToggleMute={handleToggleMute}
         />
 
-        <main className="categories-grid-section">
+        <AppNav activeView={activeView} onNavigate={setActiveView} language={language} />
+
+        {activeView === 'home' ? <main className="categories-grid-section">
           <div className="categories-grid">
             {categoryCards.map((card) => (
               <CategoryCard 
@@ -121,7 +205,36 @@ export default function App() {
               />
             ))}
           </div>
-        </main>
+        </main> : activeView === 'play' ? (
+          <main className="platform-view-shell">
+            <GameLibrary stage={profile.stage} onSelectGame={handleSelectLibraryGame} language={language} />
+          </main>
+        ) : activeView === 'check-in' ? (
+          <main className="platform-view-shell">
+            <DailyCheckIn state={platformState} onStateChange={setPlatformState} language={language} />
+          </main>
+        ) : activeView === 'anchors' ? (
+          <main className="platform-view-shell">
+            <MemoryAnchors anchors={anchors} onChanged={refreshAnchors} language={language} />
+          </main>
+        ) : activeView === 'caregiver' ? (
+          <main className="platform-view-shell">
+            <CaregiverDashboard
+              state={platformState}
+              anchorCount={anchors.length}
+              language={language}
+              onStateChange={setPlatformState}
+              onStartGame={handleStartGame}
+              onDeleteAll={handleDeleteAll}
+            />
+          </main>
+        ) : (
+          <main className="platform-view placeholder-view">
+            <p className="eyebrow">Offline cognitive companion</p>
+            <h2>{activeView === 'play' ? 'Game Library' : activeView === 'check-in' ? 'Daily Check-in' : activeView === 'anchors' ? 'Memory Anchors' : 'Caregiver Dashboard'}</h2>
+            <p>This section is ready for the next feature.</p>
+          </main>
+        )}
 
         <footer className="footer-banner-section">
           <BottomBanner />
@@ -156,15 +269,38 @@ export default function App() {
         <SettingsModal 
           onClose={() => setShowSettings(false)}
           playerName={playerName}
-          setPlayerName={setPlayerName}
-          fontSize={fontSize}
-          setFontSize={setFontSize}
-          highContrast={highContrast}
-          setHighContrast={setHighContrast}
-          voiceEnabled={voiceEnabled}
-          setVoiceEnabledState={setVoiceEnabledState}
+          setPlayerName={(name) => setPlatformState(prev => ({ ...prev, profile: { ...prev.profile, name } }))}
+          fontSize={settings.fontSize}
+          setFontSize={(fontSize) => setPlatformState(prev => ({ ...prev, settings: { ...prev.settings, fontSize } }))}
+          highContrast={settings.highContrast}
+          setHighContrast={(highContrast) => setPlatformState(prev => ({ ...prev, settings: { ...prev.settings, highContrast } }))}
+          voiceEnabled={settings.voice}
+          setVoiceEnabledState={(voice) => setPlatformState(prev => ({ ...prev, settings: { ...prev.settings, voice } }))}
           stars={stars}
+          language={language}
+          setLanguage={(language) => setPlatformState(prev => ({ ...prev, profile: { ...prev.profile, language } }))}
         />
+      )}
+
+      {selectedGame && (
+        <GameRunner
+          game={selectedGame}
+          stage={profile.stage}
+          difficulty={getAdaptiveDifficulty(platformState, selectedGame, profile.stage)}
+          playerName={playerName}
+          together={togetherMode}
+          anchors={anchors}
+          language={language}
+          onComplete={handleLibraryComplete}
+          onClose={() => setSelectedGame(null)}
+        />
+      )}
+
+      {!platformState.consent.accepted && (
+        <ConsentGate language={language} onLanguageChange={(language) => setPlatformState(prev => ({ ...prev, profile: { ...prev.profile, language } }))} onAccept={() => setPlatformState(prev => ({
+          ...prev,
+          consent: { accepted: true, acceptedAt: new Date().toISOString() }
+        }))} />
       )}
     </div>
   );

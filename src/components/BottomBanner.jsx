@@ -26,11 +26,11 @@ export function BottomBanner() {
   };
 
   return (
-    <div 
+    <button
+      type="button"
       className={`bottom-banner ${isSparkling ? 'banner-sparkle' : ''}`}
       onClick={handleAffirmationClick}
-      role="button"
-      tabIndex={0}
+      aria-label="Hear another encouraging thought"
       title="Click for a heartwarming thought!"
     >
       <div className="banner-heart-badge">
@@ -56,6 +56,6 @@ export function BottomBanner() {
           <Sparkles size={20} color="#FFC107" />
         </div>
       )}
-    </div>
+    </button>
   );
 }

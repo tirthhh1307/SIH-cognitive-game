@@ -56,12 +56,12 @@ export function SceneryInteractive({ onEarnStars }) {
         <JapiOrnament onClick={handleJapiClick} />
       </div>
 
-      <div 
+      <button
+        type="button"
         className={`hornbill-interactive ${hornbillAction ? 'pecking' : ''}`}
         onClick={handleHornbillClick}
         title="Click Paku the Hornbill to hear a cheerful morning call!"
-        role="button"
-        tabIndex={0}
+        aria-label="Hear a cheerful call from Paku the Hornbill"
       >
         <svg width="100" height="110" viewBox="0 0 100 110" fill="none">
           <path d="M60 22 C78 12, 95 18, 98 32 C92 38, 70 38, 55 35 Z" fill="#FBC02D" stroke="#37474F" strokeWidth="1.5" />
@@ -90,7 +90,7 @@ export function SceneryInteractive({ onEarnStars }) {
             <p>{birdDialogue}</p>
           </div>
         )}
-      </div>
+      </button>
     </div>
   );
 }
