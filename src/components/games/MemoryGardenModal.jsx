@@ -138,16 +138,16 @@ export function MemoryGardenModal({ onClose, onEarnStars }) {
 
   return (
     <div className="game-modal-backdrop" onClick={onClose}>
-      <div className="game-modal-card modal-green" onClick={e => e.stopPropagation()}>
+      <div className="game-modal-card modal-green" role="dialog" aria-modal="true" aria-labelledby="memory-garden-title" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-title-group">
             <span className="modal-badge-icon">🌱</span>
             <div>
-              <h2 className="modal-title">Memory Garden</h2>
+              <h2 className="modal-title" id="memory-garden-title">Memory Garden</h2>
               <p className="modal-subtitle">Nurture plants and bloom peaceful floral memories</p>
             </div>
           </div>
-          <button className="modal-close-btn" onClick={onClose} aria-label="Close">
+          <button className="modal-close-btn" onClick={onClose} aria-label="Close" autoFocus>
             <X size={24} />
           </button>
         </div>

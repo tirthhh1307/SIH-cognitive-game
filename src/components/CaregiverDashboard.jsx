@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { AlertTriangle, Download, FileText, MapPin, MessageSquareText, PhoneCall, Printer, ShieldCheck, Sparkles, Trash2, UserRoundCog } from 'lucide-react';
 import { CATEGORY_LABELS, GAME_CATEGORIES, getGame } from '../data/games';
 import { exportPlatformData, getCategorySummaries, getReviewFlags, setBaselineFromAttempts } from '../utils/platform';
+import { t } from '../data/i18n';
 
 const BASELINE_GAMES = ['sequence-repeat', 'odd-one-out', 'tap-target', 'routine-sequence', 'family-face-match'];
 
@@ -22,7 +23,7 @@ function MemoryGapMap({ summaries }) {
   </div>;
 }
 
-export function CaregiverDashboard({ state, anchorCount, onStateChange, onStartGame, onDeleteAll }) {
+export function CaregiverDashboard({ state, anchorCount, language = 'en', onStateChange, onStartGame, onDeleteAll }) {
   const [audience, setAudience] = useState('family');
   const [deleteText, setDeleteText] = useState('');
   const summaries = useMemo(() => getCategorySummaries(state), [state]);
@@ -45,7 +46,7 @@ export function CaregiverDashboard({ state, anchorCount, onStateChange, onStartG
   };
 
   return <section className="platform-view support-view caregiver-view" aria-labelledby="caregiver-title">
-    <div className="view-heading"><div><p className="eyebrow">Explainable local insights</p><h2 id="caregiver-title">Caregiver &amp; ASHA Dashboard</h2><p>{audience === 'family' ? 'A calm family view of daily activity and changes.' : 'A concise field-support view for community follow-up.'}</p></div><div className="audience-switch"><button className={audience === 'family' ? 'active' : ''} onClick={() => setAudience('family')}>Family</button><button className={audience === 'asha' ? 'active' : ''} onClick={() => setAudience('asha')}>ASHA Worker</button></div></div>
+    <div className="view-heading"><div><p className="eyebrow">Explainable local insights</p><h2 id="caregiver-title">{t(language, 'caregiver.title')}</h2><p>{audience === 'family' ? 'A calm family view of daily activity and changes.' : 'A concise field-support view for community follow-up.'}</p></div><div className="audience-switch"><button className={audience === 'family' ? 'active' : ''} onClick={() => setAudience('family')}>Family</button><button className={audience === 'asha' ? 'active' : ''} onClick={() => setAudience('asha')}>ASHA Worker</button></div></div>
     <div className="care-metrics">{[['Sessions', state.attempts.length], ['Active days', activeDays], ['Check-ins', state.checkIns.length], ['Memory anchors', anchorCount], ['Review flags', flags.length], ['Reports', state.reportsExported ?? 0]].map(([label, value]) => <div key={label}><strong>{value}</strong><span>{label}</span></div>)}</div>
 
     <div className="dashboard-grid">

@@ -4,12 +4,13 @@ import confetti from 'canvas-confetti';
 import { createMatchDeck, evaluateOrder, getStageLimit, scoreRound, shuffle } from '../../utils/gameEngine';
 import { playClickSound, playDrumBeat, playSuccessSound, playXylophoneNote } from '../../utils/audio';
 import { speakText, stopSpeaking } from '../../utils/speech';
+import { gameInstructions, gameName, t } from '../../data/i18n';
 
 const labelsFor = options => options.map((entry, index) => typeof entry === 'string'
   ? { id: index, label: entry, symbol: '' }
   : entry);
 
-function MatchGame({ game, stage, difficulty, onFinish }) {
+function MatchGame({ game, stage, difficulty, onFinish, language }) {
   const limit = getStageLimit(stage, difficulty, game.content.pairs.length);
   const [deck, setDeck] = useState(() => createMatchDeck(game.content.pairs, limit));
   const [open, setOpen] = useState([]);
@@ -44,7 +45,7 @@ function MatchGame({ game, stage, difficulty, onFinish }) {
   };
 
   return <>
-    <div className="runner-toolbar"><p>Find {limit} matching pairs.</p><button onClick={reset}><RotateCcw size={18} /> Shuffle</button></div>
+    <div className="runner-toolbar"><p>Find {limit} matching pairs.</p><button onClick={reset}><RotateCcw size={18} /> {t(language, 'actions.repeat')}</button></div>
     <div className={`runner-match-grid ${stage === 'severe' ? 'runner-large-targets' : ''}`}>
       {deck.map(card => {
         const shown = open.includes(card.key) || matched.includes(card.id);
@@ -56,7 +57,7 @@ function MatchGame({ game, stage, difficulty, onFinish }) {
   </>;
 }
 
-function SequenceGame({ game, stage, difficulty, onFinish }) {
+function SequenceGame({ game, stage, difficulty, onFinish, language }) {
   const repeatMode = game.content.mode === 'repeat';
   const rounds = game.content.rounds ?? [];
   const [roundIndex, setRoundIndex] = useState(0);
@@ -77,7 +78,7 @@ function SequenceGame({ game, stage, difficulty, onFinish }) {
         setMistakes(value => value + 1);
         setAnswer([]);
         setWatching(true);
-        speakText('Let us watch once more.');
+        speakText(t(language, 'feedback.retry'), null, language);
         return;
       }
     }
@@ -94,7 +95,7 @@ function SequenceGame({ game, stage, difficulty, onFinish }) {
     } else {
       setMistakes(value => value + 1);
       setAnswer([]);
-      speakText('Good try. Let us arrange those steps again.');
+      speakText(t(language, 'feedback.retry'), null, language);
     }
   };
 
@@ -102,7 +103,7 @@ function SequenceGame({ game, stage, difficulty, onFinish }) {
     <div className="runner-prompt">
       <h3>{repeatMode ? (watching ? 'Watch this order' : 'Your turn') : rounds[roundIndex].prompt}</h3>
       {watching && <div className="watch-sequence">{items.map(item => <span key={item.id}>{item.symbol}</span>)}</div>}
-      {repeatMode && <button className="game-primary-btn" onClick={() => { setWatching(!watching); setAnswer([]); }}>{watching ? 'Hide pattern & start' : 'Watch again'}</button>}
+      {repeatMode && <button className="game-primary-btn" onClick={() => { setWatching(!watching); setAnswer([]); }}>{watching ? t(language, 'actions.play') : t(language, 'actions.repeat')}</button>}
     </div>
     {!watching && <div className="runner-choice-grid">
       {choices.map(item => <button key={item.id} onClick={() => select(item.id)} disabled={answer.includes(item.id) && !repeatMode}><span>{item.symbol}</span>{item.label}</button>)}
@@ -114,7 +115,7 @@ function SequenceGame({ game, stage, difficulty, onFinish }) {
   </div>;
 }
 
-function RecallGame({ game, stage, onFinish }) {
+function RecallGame({ game, stage, onFinish, language }) {
   const [roundIndex, setRoundIndex] = useState(0);
   const [studying, setStudying] = useState(true);
   const [correct, setCorrect] = useState(0);
@@ -124,7 +125,7 @@ function RecallGame({ game, stage, onFinish }) {
   const choose = index => {
     const nextTries = tries + 1;
     setTries(nextTries);
-    if (index !== round.correct) { speakText('Good try. Look once more.'); setStudying(true); return; }
+    if (index !== round.correct) { speakText(t(language, 'feedback.retry'), null, language); setStudying(true); return; }
     const nextCorrect = correct + 1;
     setCorrect(nextCorrect);
     if (roundIndex === game.content.rounds.length - 1) onFinish(nextCorrect, nextTries, nextTries - nextCorrect);
@@ -136,7 +137,7 @@ function RecallGame({ game, stage, onFinish }) {
   </div>;
 }
 
-function ChoiceGame({ game, stage, onFinish, audio = false }) {
+function ChoiceGame({ game, stage, onFinish, audio = false, language }) {
   const [roundIndex, setRoundIndex] = useState(0);
   const [correct, setCorrect] = useState(0);
   const [tries, setTries] = useState(0);
@@ -151,12 +152,12 @@ function ChoiceGame({ game, stage, onFinish, audio = false }) {
     else if (round.sound === 'dhol-low') playDrumBeat('low');
     else if (round.sound === 'dhol-high') playDrumBeat('high');
     else if (round.sound === 'xylophone') [261.63, 329.63, 392].forEach((note, index) => setTimeout(() => playXylophoneNote(note), index * 180));
-    else speakText(round.prompt);
+    else speakText(round.prompt, null, language);
   };
   const choose = index => {
     const nextTries = tries + 1;
     setTries(nextTries);
-    if (index !== correctIndex) { setFeedback(round.explanation ?? 'Take another look.'); speakText('Good try. Take another look.'); return; }
+    if (index !== correctIndex) { setFeedback(round.explanation ?? t(language, 'feedback.retry')); speakText(t(language, 'feedback.retry'), null, language); return; }
     const nextCorrect = correct + 1;
     setCorrect(nextCorrect);
     setFeedback(round.explanation ?? 'Well done!');
@@ -174,14 +175,14 @@ function ChoiceGame({ game, stage, onFinish, audio = false }) {
   </div>;
 }
 
-function SortingGame({ game, onFinish }) {
+function SortingGame({ game, onFinish, language }) {
   const [selected, setSelected] = useState(null);
   const [placed, setPlaced] = useState([]);
   const [mistakes, setMistakes] = useState(0);
   const place = targetId => {
     if (!selected) return;
     const item = game.content.items.find(entry => entry.id === selected);
-    if (item.target !== targetId) { setMistakes(value => value + 1); speakText('Try the other group.'); return; }
+    if (item.target !== targetId) { setMistakes(value => value + 1); speakText(t(language, 'feedback.retry'), null, language); return; }
     const next = [...placed, selected];
     setPlaced(next);
     setSelected(null);
@@ -194,14 +195,14 @@ function SortingGame({ game, onFinish }) {
   </div>;
 }
 
-function ActionGame({ game, stage, onFinish }) {
+function ActionGame({ game, stage, onFinish, language }) {
   const [roundIndex, setRoundIndex] = useState(0);
   const [tries, setTries] = useState(0);
   const round = game.content.rounds[roundIndex];
   const advance = success => {
     const nextTries = tries + 1;
     setTries(nextTries);
-    if (!success) { speakText('Almost. Try once more.'); return; }
+    if (!success) { speakText(t(language, 'feedback.retry'), null, language); return; }
     if (roundIndex === game.content.rounds.length - 1) onFinish(game.content.rounds.length, nextTries, nextTries - game.content.rounds.length);
     else setRoundIndex(value => value + 1);
   };
@@ -211,7 +212,7 @@ function ActionGame({ game, stage, onFinish }) {
   return <div className={`target-runner ${stage === 'severe' ? 'runner-large-targets' : ''}`}><h3>{round.prompt}</h3><div className="target-grid">{Array.from({ length: 9 }, (_, index) => <button key={index} onClick={() => advance(index === position)}>{index === position ? round.target : round.distractors[index % round.distractors.length]}</button>)}</div></div>;
 }
 
-export function GameRunner({ game, stage, difficulty, playerName, together, anchors = [], onComplete, onClose }) {
+export function GameRunner({ game, stage, difficulty, playerName, together, anchors = [], language = 'en', onComplete, onClose }) {
   const startedAt = useRef(Date.now());
   const [result, setResult] = useState(null);
   const mediaUrls = useMemo(() => anchors.flatMap(anchor => [
@@ -251,7 +252,7 @@ export function GameRunner({ game, stage, difficulty, playerName, together, anch
   const usingDemo = Boolean(game.content.source) && personalizedGame === game;
 
   useEffect(() => {
-    speakText(personalizedGame.instructions);
+    speakText(gameInstructions(language, personalizedGame), null, language);
     const closeOnEscape = event => { if (event.key === 'Escape') onClose(); };
     window.addEventListener('keydown', closeOnEscape);
     return () => { window.removeEventListener('keydown', closeOnEscape); stopSpeaking(); };
@@ -266,11 +267,11 @@ export function GameRunner({ game, stage, difficulty, playerName, together, anch
     setResult(completed);
     playSuccessSound();
     if (!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) confetti({ particleCount: 60, spread: 70 });
-    speakText(together ? `Wonderful teamwork, ${playerName}!` : `Wonderful work, ${playerName}!`);
+    speakText(t(language, together ? 'feedback.team' : 'feedback.welcome', { name: playerName }), null, language);
     onComplete(completed);
   };
 
-  const props = { game: personalizedGame, stage, difficulty, onFinish: finish };
+  const props = { game: personalizedGame, stage, difficulty, language, onFinish: finish };
   const engine = personalizedGame.engine === 'match' ? <MatchGame {...props} />
     : personalizedGame.engine === 'sequence' ? <SequenceGame {...props} />
     : personalizedGame.engine === 'recall' ? <RecallGame {...props} />
@@ -283,13 +284,13 @@ export function GameRunner({ game, stage, difficulty, playerName, together, anch
   return <div className="game-modal-backdrop" onClick={onClose}>
     <section className="game-modal-card runner-modal" role="dialog" aria-modal="true" aria-labelledby="runner-title" onClick={event => event.stopPropagation()}>
       <header className="modal-header">
-        <div className="modal-title-group"><span className="modal-badge-icon">🧠</span><div><h2 className="modal-title" id="runner-title">{game.name}</h2><p className="modal-subtitle">{together && <><Users size={15} /> Together mode · </>}{stage} · level {difficulty}</p></div></div>
-        <button className="modal-close-btn" onClick={onClose} aria-label="Close game"><X size={24} /></button>
+        <div className="modal-title-group"><span className="modal-badge-icon">🧠</span><div><h2 className="modal-title" id="runner-title">{gameName(language, game)}</h2><p className="modal-subtitle">{together && <><Users size={15} /> Together mode · </>}{stage} · level {difficulty}</p></div></div>
+        <button className="modal-close-btn" onClick={onClose} aria-label={t(language, 'actions.close')} autoFocus><X size={24} /></button>
       </header>
-      <div className="runner-instructions">{personalizedGame.instructions}</div>
+      <div className="runner-instructions">{gameInstructions(language, personalizedGame)}</div>
       {usingDemo && <div className="demo-content-note">Using demo family memories—add your own in Memory Anchors.</div>}
       <div className="game-content runner-content">
-        {result ? <div className="runner-complete"><span>⭐</span><h3>{together ? 'Wonderful teamwork!' : 'Round complete!'}</h3><p>{result.accuracy}% accuracy · {result.hints} hints</p><button className="game-primary-btn" onClick={onClose}>Back to library</button></div> : engine}
+        {result ? <div className="runner-complete"><span>⭐</span><h3>{t(language, together ? 'feedback.team' : 'feedback.welcome', { name: playerName })}</h3><p>{result.accuracy}% accuracy · {result.hints} hints</p><button className="game-primary-btn" onClick={onClose}>{t(language, 'actions.back')}</button></div> : engine}
       </div>
     </section>
   </div>;

@@ -2,6 +2,7 @@ import React from 'react';
 import { Home, Gamepad2, ClipboardCheck, Images, HeartPulse } from 'lucide-react';
 import { NAV_ITEMS } from '../data/shell';
 import { playClickSound } from '../utils/audio';
+import { t } from '../data/i18n';
 
 const ICONS = {
   home: Home,
@@ -11,7 +12,7 @@ const ICONS = {
   care: HeartPulse
 };
 
-export function AppNav({ activeView, onNavigate }) {
+export function AppNav({ activeView, onNavigate, language = 'en' }) {
   return (
     <nav className="app-nav" aria-label="Main navigation">
       {NAV_ITEMS.map(item => {
@@ -25,7 +26,7 @@ export function AppNav({ activeView, onNavigate }) {
             aria-current={active ? 'page' : undefined}
           >
             <Icon size={20} aria-hidden="true" />
-            <span>{item.label}</span>
+            <span>{t(language, `nav.${item.id}`)}</span>
           </button>
         );
       })}

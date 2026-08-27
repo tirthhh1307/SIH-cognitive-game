@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { Search, Users, X } from 'lucide-react';
 import { CATEGORY_LABELS, GAME_CATEGORIES, GAMES } from '../data/games';
+import { gameName, t } from '../data/i18n';
 
-export function GameLibrary({ stage, onSelectGame }) {
+export function GameLibrary({ stage, onSelectGame, language = 'en' }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [stageFilter, setStageFilter] = useState(stage);
@@ -27,14 +28,14 @@ export function GameLibrary({ stage, onSelectGame }) {
     <section className="platform-view game-library" aria-labelledby="library-title">
       <div className="view-heading">
         <div>
-          <p className="eyebrow">26 gentle activities</p>
-          <h2 id="library-title">Cognitive Game Library</h2>
-          <p>Choose by current stage or explore every activity.</p>
+          <p className="eyebrow">{t(language, 'library.eyebrow')}</p>
+          <h2 id="library-title">{t(language, 'library.title')}</h2>
+          <p>{t(language, 'library.subtitle')}</p>
         </div>
         <label className={`together-toggle ${together ? 'active' : ''}`}>
           <input type="checkbox" checked={together} onChange={event => setTogether(event.target.checked)} />
           <Users size={21} aria-hidden="true" />
-          Play together
+          {t(language, 'library.together')}
         </label>
       </div>
 
@@ -42,7 +43,7 @@ export function GameLibrary({ stage, onSelectGame }) {
         <label className="search-field">
           <Search size={20} aria-hidden="true" />
           <span className="sr-only">Search games</span>
-          <input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search games" />
+          <input value={query} onChange={event => setQuery(event.target.value)} placeholder={t(language, 'library.search')} />
         </label>
         <label>
           <span>Category</span>
@@ -73,10 +74,10 @@ export function GameLibrary({ stage, onSelectGame }) {
                 <span className="stage-chip">{game.stages.join(' · ')}</span>
               </div>
               <p className="game-category">{CATEGORY_LABELS[game.category]}</p>
-              <h3>{game.name}</h3>
+              <h3>{gameName(language, game)}</h3>
               <p>{game.description}</p>
               <button className="library-play-btn" onClick={() => onSelectGame(game, together)}>
-                Play {together ? 'together' : 'now'}
+                {t(language, 'actions.play')} {together ? `· ${t(language, 'library.together')}` : ''}
               </button>
             </article>
           ))}

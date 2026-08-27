@@ -34,6 +34,7 @@ export default function App() {
 
   const { profile, settings, stars } = platformState;
   const playerName = profile.name;
+  const language = profile.language;
 
   useEffect(() => {
     savePlatformState(platformState, localStorage);
@@ -51,10 +52,21 @@ export default function App() {
   useEffect(() => {
     if (!platformState.consent.accepted) return undefined;
     const timer = setTimeout(() => {
-      speakText(`Welcome, ${playerName}! Let's have a fun and happy day!`);
+      speakText(`Welcome, ${playerName}! Let's have a fun and happy day!`, null, language);
     }, 1200);
     return () => clearTimeout(timer);
-  }, [platformState.consent.accepted]);
+  }, [platformState.consent.accepted, language]);
+
+  useEffect(() => {
+    const closeOnEscape = event => {
+      if (event.key !== 'Escape') return;
+      setActiveModal(null);
+      setShowSettings(false);
+      setSelectedGame(null);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, []);
 
   const handleEarnStars = (amount, reason) => {
     setPlatformState(prev => ({ ...prev, stars: prev.stars + amount }));
@@ -172,7 +184,7 @@ export default function App() {
           onToggleMute={handleToggleMute}
         />
 
-        <AppNav activeView={activeView} onNavigate={setActiveView} />
+        <AppNav activeView={activeView} onNavigate={setActiveView} language={language} />
 
         {activeView === 'home' ? <main className="categories-grid-section">
           <div className="categories-grid">
@@ -191,21 +203,22 @@ export default function App() {
           </div>
         </main> : activeView === 'play' ? (
           <main className="platform-view-shell">
-            <GameLibrary stage={profile.stage} onSelectGame={handleSelectLibraryGame} />
+            <GameLibrary stage={profile.stage} onSelectGame={handleSelectLibraryGame} language={language} />
           </main>
         ) : activeView === 'check-in' ? (
           <main className="platform-view-shell">
-            <DailyCheckIn state={platformState} onStateChange={setPlatformState} />
+            <DailyCheckIn state={platformState} onStateChange={setPlatformState} language={language} />
           </main>
         ) : activeView === 'anchors' ? (
           <main className="platform-view-shell">
-            <MemoryAnchors anchors={anchors} onChanged={refreshAnchors} />
+            <MemoryAnchors anchors={anchors} onChanged={refreshAnchors} language={language} />
           </main>
         ) : activeView === 'caregiver' ? (
           <main className="platform-view-shell">
             <CaregiverDashboard
               state={platformState}
               anchorCount={anchors.length}
+              language={language}
               onStateChange={setPlatformState}
               onStartGame={handleStartGame}
               onDeleteAll={handleDeleteAll}
@@ -260,6 +273,8 @@ export default function App() {
           voiceEnabled={settings.voice}
           setVoiceEnabledState={(voice) => setPlatformState(prev => ({ ...prev, settings: { ...prev.settings, voice } }))}
           stars={stars}
+          language={language}
+          setLanguage={(language) => setPlatformState(prev => ({ ...prev, profile: { ...prev.profile, language } }))}
         />
       )}
 
@@ -271,13 +286,14 @@ export default function App() {
           playerName={playerName}
           together={togetherMode}
           anchors={anchors}
+          language={language}
           onComplete={handleLibraryComplete}
           onClose={() => setSelectedGame(null)}
         />
       )}
 
       {!platformState.consent.accepted && (
-        <ConsentGate onAccept={() => setPlatformState(prev => ({
+        <ConsentGate language={language} onLanguageChange={(language) => setPlatformState(prev => ({ ...prev, profile: { ...prev.profile, language } }))} onAccept={() => setPlatformState(prev => ({
           ...prev,
           consent: { accepted: true, acceptedAt: new Date().toISOString() }
         }))} />

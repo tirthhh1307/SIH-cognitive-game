@@ -13,15 +13,14 @@ export function CategoryCard({
   onClick
 }) {
   return (
-    <div 
+    <button
+      type="button"
       className={`category-card ${gradientClass}`}
       onClick={() => {
         playClickSound();
         onClick(id);
       }}
       onMouseEnter={playHoverSound}
-      role="button"
-      tabIndex={0}
       aria-label={`${title}: ${description}`}
     >
       <div className="card-top-pattern">
@@ -44,6 +43,6 @@ export function CategoryCard({
           </div>
         </div>
       </div>
-    </div>
+    </button>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ImagePlus, Mic, ShieldCheck, Trash2, Users } from 'lucide-react';
 import { deleteAnchor, putAnchor, validateAnchorInput } from '../utils/mediaStore';
+import { t } from '../data/i18n';
 
 function AnchorCard({ anchor, onDelete }) {
   const photoUrl = useMemo(() => anchor.photoBlob ? URL.createObjectURL(anchor.photoBlob) : '', [anchor.photoBlob]);
@@ -16,7 +17,7 @@ function AnchorCard({ anchor, onDelete }) {
   </article>;
 }
 
-export function MemoryAnchors({ anchors, onChanged }) {
+export function MemoryAnchors({ anchors, onChanged, language = 'en' }) {
   const [name, setName] = useState('');
   const [relationship, setRelationship] = useState('');
   const [photoBlob, setPhotoBlob] = useState(null);
@@ -52,7 +53,7 @@ export function MemoryAnchors({ anchors, onChanged }) {
   };
 
   return <section className="platform-view support-view anchors-view" aria-labelledby="anchors-title">
-    <div className="view-heading"><div><p className="eyebrow">Personalized & private</p><h2 id="anchors-title">Memory Anchors</h2><p>Add familiar people for face, family-tree, photo, and voice games.</p></div><span className="local-only-badge"><ShieldCheck size={18} />On this device</span></div>
+    <div className="view-heading"><div><p className="eyebrow">Personalized &amp; private</p><h2 id="anchors-title">{t(language, 'anchors.title')}</h2><p>Add familiar people for face, family-tree, photo, and voice games.</p></div><span className="local-only-badge"><ShieldCheck size={18} />On this device</span></div>
     <div className="anchor-layout">
       <form className="support-card anchor-form" onSubmit={save}>
         <h3>Add a familiar person</h3>

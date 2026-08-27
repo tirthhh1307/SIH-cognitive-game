@@ -149,16 +149,16 @@ export function MindGamesModal({ onClose, onEarnStars }) {
 
   return (
     <div className="game-modal-backdrop" onClick={onClose}>
-      <div className="game-modal-card modal-orange" onClick={e => e.stopPropagation()}>
+      <div className="game-modal-card modal-orange" role="dialog" aria-modal="true" aria-labelledby="mind-games-title" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-title-group">
             <span className="modal-badge-icon">🧠</span>
             <div>
-              <h2 className="modal-title">Mind Games</h2>
+              <h2 className="modal-title" id="mind-games-title">Mind Games</h2>
               <p className="modal-subtitle">Gentle exercises for focus, memory & joy</p>
             </div>
           </div>
-          <button className="modal-close-btn" onClick={onClose} aria-label="Close">
+          <button className="modal-close-btn" onClick={onClose} aria-label="Close" autoFocus>
             <X size={24} />
           </button>
         </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Bell, Check, HeartPulse, Phone, Plus, Trash2 } from 'lucide-react';
 import { addCheckIn, getDueReminders, removeReminder, upsertReminder } from '../utils/platform';
+import { t } from '../data/i18n';
 
 const MOODS = [
   { id: 'great', label: 'Great', symbol: '😊' },
@@ -12,7 +13,7 @@ const MOODS = [
 
 const localDate = date => [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
 
-export function DailyCheckIn({ state, onStateChange }) {
+export function DailyCheckIn({ state, onStateChange, language = 'en' }) {
   const today = localDate(new Date());
   const saved = state.checkIns.find(entry => entry.date === today);
   const [form, setForm] = useState(saved ?? { medicine: false, meals: false, walk: false, mood: 'calm', recentEvent: '' });
@@ -77,7 +78,7 @@ export function DailyCheckIn({ state, onStateChange }) {
   return (
     <section className="platform-view support-view" aria-labelledby="checkin-title">
       <div className="view-heading">
-        <div><p className="eyebrow">A gentle daily moment</p><h2 id="checkin-title">Daily Check-in</h2><p>No perfect answers needed. Record what feels right today.</p></div>
+        <div><p className="eyebrow">A gentle daily moment</p><h2 id="checkin-title">{t(language, 'checkin.title')}</h2><p>No perfect answers needed. Record what feels right today.</p></div>
         <span className="local-only-badge">Saved locally</span>
       </div>
 

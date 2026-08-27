@@ -96,16 +96,16 @@ export function StoriesMemoriesModal({ onClose, onEarnStars }) {
 
   return (
     <div className="game-modal-backdrop" onClick={() => { stopSpeaking(); onClose(); }}>
-      <div className="game-modal-card modal-purple" onClick={e => e.stopPropagation()}>
+      <div className="game-modal-card modal-purple" role="dialog" aria-modal="true" aria-labelledby="stories-title" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-title-group">
             <span className="modal-badge-icon">📖</span>
             <div>
-              <h2 className="modal-title">Stories & Memories</h2>
+              <h2 className="modal-title" id="stories-title">Stories & Memories</h2>
               <p className="modal-subtitle">Heartwarming cultural tales & nostalgic reflections</p>
             </div>
           </div>
-          <button className="modal-close-btn" onClick={() => { stopSpeaking(); onClose(); }} aria-label="Close">
+          <button className="modal-close-btn" onClick={() => { stopSpeaking(); onClose(); }} aria-label="Close" autoFocus>
             <X size={24} />
           </button>
         </div>

@@ -49,7 +49,7 @@ export function GoldenDivider() {
 
 export function JapiOrnament({ onClick }) {
   return (
-    <div className="japi-ornament-interactive" onClick={onClick} title="Click to spin the auspicious Japi!">
+    <button type="button" className="japi-ornament-interactive" onClick={onClick} title="Spin the auspicious Japi" aria-label="Spin the auspicious Japi">
       <svg width="84" height="110" viewBox="0 0 84 110" fill="none">
         <line x1="42" y1="0" x2="42" y2="15" stroke="#D32F2F" strokeWidth="2.5" />
         <circle cx="42" cy="45" r="30" fill="#FFF2C6" stroke="#8D6E63" strokeWidth="2" />
@@ -78,6 +78,6 @@ export function JapiOrnament({ onClick }) {
         <line x1="48" y1="75" x2="48" y2="105" stroke="#2E7D32" strokeWidth="2" strokeDasharray="4 2" />
         <circle cx="48" cy="106" r="2.5" fill="#2E7D32" />
       </svg>
-    </div>
+    </button>
   );
 }

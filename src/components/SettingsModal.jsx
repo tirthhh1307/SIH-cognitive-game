@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, Volume2, Eye, Type, User, Sparkles, Check, Play, Square } from 'lucide-react';
+import { X, Volume2, Eye, Type, User, Sparkles, Check, Play, Square, Languages } from 'lucide-react';
 import { playClickSound, setSoundVolume, setNatureVolume, startNatureAmbience, stopNatureAmbience } from '../utils/audio';
 import { setVoiceEnabled, speakText } from '../utils/speech';
+import { LANGUAGES } from '../data/i18n';
 
 export function SettingsModal({
   onClose,
@@ -13,7 +14,9 @@ export function SettingsModal({
   setHighContrast,
   voiceEnabled,
   setVoiceEnabledState,
-  stars
+  stars,
+  language,
+  setLanguage
 }) {
   const [sfxVol, setSfxVol] = useState(80);
   const [natureVol, setNatureVolState] = useState(50);
@@ -64,21 +67,31 @@ export function SettingsModal({
 
   return (
     <div className="game-modal-backdrop" onClick={onClose}>
-      <div className="settings-modal-card" onClick={e => e.stopPropagation()}>
+      <div className="settings-modal-card" role="dialog" aria-modal="true" aria-labelledby="settings-title" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-title-group">
             <span className="modal-badge-icon">⚙️</span>
             <div>
-              <h2 className="modal-title">Settings & Accessibility</h2>
+              <h2 className="modal-title" id="settings-title">Settings & Accessibility</h2>
               <p className="modal-subtitle">Customize audio, text size, and preferences</p>
             </div>
           </div>
-          <button className="modal-close-btn" onClick={onClose} aria-label="Close">
+          <button className="modal-close-btn" onClick={onClose} aria-label="Close" autoFocus>
             <X size={24} />
           </button>
         </div>
 
         <div className="settings-body">
+          <div className="settings-section">
+            <h3 className="section-heading"><Languages size={20} /> Language</h3>
+            <div className="font-buttons-group">
+              {Object.entries(LANGUAGES).map(([id, label]) => (
+                <button key={id} type="button" className={`font-opt-btn ${language === id ? 'selected' : ''}`} onClick={() => setLanguage(id)}>{label}</button>
+              ))}
+            </div>
+            <p className="toggle-desc">Assamese is a pilot pack. On-screen text remains available when an Assamese device voice is not installed.</p>
+          </div>
+
           <div className="settings-section">
             <h3 className="section-heading">
               <User size={20} /> Player Profile
