@@ -23,12 +23,16 @@ test('service worker installs the complete offline shell', async () => {
       clients: { claim: () => Promise.resolve() }
     },
     caches: {
-      open: async () => ({ addAll: async files => { installedFiles = files; } }),
+      open: async () => ({ addAll: async files => { installedFiles.push(...files); } }),
       keys: async () => [],
       delete: async () => true,
       match: async () => undefined
     },
-    fetch: async () => ({ ok: true, clone() { return this; } }),
+    fetch: async () => ({
+      ok: true,
+      clone() { return this; },
+      text: async () => '<script src="/assets/index-abc.js"></script><link href="/assets/index-def.css">'
+    }),
     URL,
     Promise
   };
@@ -37,5 +41,11 @@ test('service worker installs the complete offline shell', async () => {
   let installation;
   handlers.install({ waitUntil: promise => { installation = promise; } });
   await installation;
-  assert.deepEqual([...installedFiles], ['/', '/index.html', '/manifest.webmanifest', '/app-icon.svg', '/avatar_apoi.jpg', '/scenic_bg.jpg']);
+  assert.deepEqual(installedFiles, ['/', '/index.html', '/manifest.webmanifest', '/app-icon.svg', '/avatar_apoi.jpg', '/scenic_bg.jpg', '/assets/index-abc.js', '/assets/index-def.css']);
+  let interceptedApi = false;
+  handlers.fetch({
+    request: { method: 'GET', url: 'https://example.test/api/patient', destination: '', mode: 'cors' },
+    respondWith: () => { interceptedApi = true; }
+  });
+  assert.equal(interceptedApi, false);
 });

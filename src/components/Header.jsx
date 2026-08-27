@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Settings, Star, Volume2, VolumeX } from 'lucide-react';
 import { GoldenDivider } from './CulturalPattern';
 import { playClickSound } from '../utils/audio';
@@ -11,30 +11,27 @@ export function Header({
   isMuted, 
   onToggleMute 
 }) {
+  const [avatarFailed, setAvatarFailed] = useState(false);
   return (
     <header className="game-header">
-      <div 
+      <button
+        type="button"
         className="profile-pill" 
         onClick={() => { playClickSound(); onOpenProfile(); }}
-        role="button"
-        tabIndex={0}
         aria-label={`Profile for ${playerName}`}
       >
         <div className="avatar-circle">
-          <img 
+          {avatarFailed ? '👵' : <img
             src="/avatar_apoi.jpg" 
             alt={playerName} 
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.parentNode.innerHTML = '👵';
-            }}
-          />
+            onError={() => setAvatarFailed(true)}
+          />}
         </div>
         <div className="profile-text">
           <span className="greeting-text">Hello,</span>
           <span className="player-name">{playerName}</span>
         </div>
-      </div>
+      </button>
 
       <div className="welcome-center">
         <h1 className="welcome-title">Welcome!</h1>

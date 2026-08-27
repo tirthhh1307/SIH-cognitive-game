@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createMatchDeck, evaluateOrder, getStageLimit, scoreRound } from '../src/utils/gameEngine.js';
+import { createMatchDeck, createSequence, evaluateOrder, getStageLimit, scoreRound } from '../src/utils/gameEngine.js';
 
 test('match deck creates two uniquely keyed cards per selected pair', () => {
   const deck = createMatchDeck([
@@ -27,4 +27,11 @@ test('stage limits reduce choices without hiding binary severe content', () => {
 test('score round protects division by zero', () => {
   assert.deepEqual(scoreRound(0, 0), { accuracy: 0, score: 0 });
   assert.deepEqual(scoreRound(2, 3), { accuracy: 67, score: 67 });
+});
+
+test('sequence generator creates requested repeatable pattern', () => {
+  const items = [{ id: 'tea' }, { id: 'dhol' }, { id: 'lotus' }];
+  const values = [0, 0.4, 0.9, 0.1];
+  let index = 0;
+  assert.deepEqual(createSequence(items, 4, () => values[index++]), ['tea', 'dhol', 'lotus', 'tea']);
 });

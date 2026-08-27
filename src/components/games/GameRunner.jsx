@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Eye, Lightbulb, Play, RotateCcw, Users, X } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { createMatchDeck, evaluateOrder, getStageLimit, scoreRound, shuffle } from '../../utils/gameEngine';
+import { createMatchDeck, createSequence, evaluateOrder, getStageLimit, scoreRound, shuffle } from '../../utils/gameEngine';
 import { playClickSound, playDrumBeat, playSuccessSound, playXylophoneNote } from '../../utils/audio';
 import { speakText, stopSpeaking } from '../../utils/speech';
 import { gameInstructions, gameName, t } from '../../data/i18n';
@@ -67,7 +67,8 @@ function SequenceGame({ game, stage, difficulty, onFinish, language }) {
   const items = repeatMode
     ? game.content.items.slice(0, getStageLimit(stage, difficulty, game.content.items.length))
     : rounds[roundIndex].steps;
-  const expected = repeatMode ? items.map(({ id }) => id) : items.map(({ id }) => id);
+  const pattern = useMemo(() => repeatMode ? createSequence(items, items.length) : [], [game.id, stage, difficulty]);
+  const expected = repeatMode ? pattern : items.map(({ id }) => id);
   const choices = useMemo(() => repeatMode ? items : shuffle(items), [game.id, roundIndex, watching]);
 
   const select = id => {
@@ -102,7 +103,7 @@ function SequenceGame({ game, stage, difficulty, onFinish, language }) {
   return <div className="sequence-runner">
     <div className="runner-prompt">
       <h3>{repeatMode ? (watching ? 'Watch this order' : 'Your turn') : rounds[roundIndex].prompt}</h3>
-      {watching && <div className="watch-sequence">{items.map(item => <span key={item.id}>{item.symbol}</span>)}</div>}
+      {watching && <div className="watch-sequence">{expected.map((id, index) => <span key={`${id}-${index}`}>{items.find(item => item.id === id)?.symbol}</span>)}</div>}
       {repeatMode && <button className="game-primary-btn" onClick={() => { setWatching(!watching); setAnswer([]); }}>{watching ? t(language, 'actions.play') : t(language, 'actions.repeat')}</button>}
     </div>
     {!watching && <div className="runner-choice-grid">

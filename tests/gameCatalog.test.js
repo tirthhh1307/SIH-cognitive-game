@@ -31,3 +31,10 @@ test('every engine has configured games and each game has three playable records
     assert.ok(count >= 3, `${game.id} needs at least three playable records`);
   }
 });
+
+test('documented category count and stage coverage remain complete', () => {
+  assert.equal(new Set(GAMES.map(({ category }) => category)).size, 10);
+  for (const stage of ['mild', 'moderate', 'severe']) {
+    assert.ok(GAMES.some(({ stages }) => stages.includes(stage)), `${stage} needs games`);
+  }
+});

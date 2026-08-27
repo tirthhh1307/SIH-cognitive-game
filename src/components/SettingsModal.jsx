@@ -52,7 +52,7 @@ export function SettingsModal({
     setVoiceEnabledState(nextVal);
     setVoiceEnabled(nextVal);
     if (nextVal) {
-      speakText("Voice assistance is now turned on. Welcome!");
+      speakText("Voice assistance is now turned on. Welcome!", null, language);
     }
   };
 
@@ -61,7 +61,7 @@ export function SettingsModal({
     if (tempName.trim()) {
       setPlayerName(tempName.trim());
       playClickSound();
-      speakText(`Welcome, ${tempName.trim()}!`);
+      speakText(`Welcome, ${tempName.trim()}!`, null, language);
     }
   };
 

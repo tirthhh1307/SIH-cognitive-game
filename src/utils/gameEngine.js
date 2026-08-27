@@ -15,6 +15,11 @@ export function createMatchDeck(pairs, limit, random = Math.random) {
   ]), random);
 }
 
+export function createSequence(items, length, random = Math.random) {
+  if (!items.length || length <= 0) return [];
+  return Array.from({ length }, () => items[Math.floor(random() * items.length)].id);
+}
+
 export function evaluateOrder(answerIds, expectedIds) {
   return answerIds.length === expectedIds.length && answerIds.every((id, index) => id === expectedIds[index]);
 }

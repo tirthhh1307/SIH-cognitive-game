@@ -37,6 +37,10 @@ export default function App() {
   const language = profile.language;
 
   useEffect(() => {
+    document.documentElement.lang = language === 'as' ? 'as' : 'en';
+  }, [language]);
+
+  useEffect(() => {
     savePlatformState(platformState, localStorage);
   }, [platformState]);
 

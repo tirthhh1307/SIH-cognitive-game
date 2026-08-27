@@ -2,11 +2,15 @@ const CACHE_NAME = 'cognitive-platform-shell-v1';
 const SHELL_FILES = ['/', '/index.html', '/manifest.webmanifest', '/app-icon.svg', '/avatar_apoi.jpg', '/scenic_bg.jpg'];
 
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(SHELL_FILES))
-      .then(() => self.skipWaiting())
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    await cache.addAll(SHELL_FILES);
+    const indexResponse = await fetch('/index.html');
+    const html = await indexResponse.text();
+    const assets = [...html.matchAll(/(?:src|href)="(\/assets\/[^"?]+)"/g)].map(match => match[1]);
+    if (assets.length) await cache.addAll([...new Set(assets)]);
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', event => {
@@ -21,6 +25,8 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
+  const staticDestinations = ['document', 'script', 'style', 'image', 'font'];
+  if (event.request.mode !== 'navigate' && !staticDestinations.includes(event.request.destination)) return;
   event.respondWith((async () => {
     const cached = await caches.match(event.request);
     if (cached) return cached;
@@ -32,7 +38,8 @@ self.addEventListener('fetch', event => {
       }
       return response;
     } catch {
-      return caches.match('/index.html');
+      if (event.request.mode === 'navigate') return caches.match('/index.html');
+      return new Response('Offline asset unavailable', { status: 503 });
     }
   })());
 });
