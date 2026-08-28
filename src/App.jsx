@@ -283,8 +283,8 @@ export default function App() {
             <button type="button" className="avatar-companion-entry" onClick={() => setActiveView('companion')}>
               <img src={avatar} alt="" />
               <span>
-                <strong>Talk with your companion</strong>
-                <small>Speak or type. Replies are read aloud.</small>
+                <strong>{t(language, 'companion.entry')}</strong>
+                <small>{t(language, 'companion.entrySub')}</small>
               </span>
               <span aria-hidden="true">→</span>
             </button>
@@ -343,7 +343,7 @@ export default function App() {
           </main>
         )}
 
-        <footer className={`footer-banner-section ${activeView === 'home' ? 'footer-home-layout' : ''}`}>
+      {activeView !== 'companion' && <footer className={`footer-banner-section ${activeView === 'home' ? 'footer-home-layout' : ''}`}>
           {activeView === 'home' && (
             <div className="home-footer-left">
               <WeatherWidget language={language} />
@@ -357,7 +357,7 @@ export default function App() {
               <PositiveNewsWidget language={language} />
             </div>
           )}
-        </footer>
+      </footer>}
       </div>
 
       {starNotification && (

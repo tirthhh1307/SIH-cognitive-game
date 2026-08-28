@@ -122,6 +122,7 @@ export default function AvatarCanvas({
           const index = resolveMorphIndex(mesh.morphTargetDictionary, name);
           if (!Number.isInteger(index)) continue;
           let target = targets[name] || 0;
+          if (reducedMotion && !name.startsWith('eyeBlink')) target *= 0.65;
           if (name === 'eyeBlinkLeft' || name === 'eyeBlinkRight') target = Math.max(target, blinkWeight);
           mesh.morphTargetInfluences[index] = THREE.MathUtils.lerp(
             mesh.morphTargetInfluences[index] || 0,

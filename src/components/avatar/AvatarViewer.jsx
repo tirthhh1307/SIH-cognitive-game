@@ -5,14 +5,7 @@ import { sendChat } from '../../utils/avatar/chatApi.js';
 import { createSpeechVisemeEvents } from '../../utils/avatar/speechVisemes.js';
 import { getAvatarMedia } from '../../utils/mediaStore.js';
 import { speakText, stopSpeaking } from '../../utils/speech.js';
-
-const STATUS_COPY = {
-  ready: 'Ready',
-  listening: 'Listening',
-  thinking: 'Thinking',
-  speaking: 'Speaking',
-  error: 'Needs attention'
-};
+import { t } from '../../data/i18n.js';
 
 export default function AvatarViewer({
   language = 'en',
@@ -37,6 +30,7 @@ export default function AvatarViewer({
   const speechEventsRef = useRef();
   const discardRecordingRef = useRef(false);
   const disposedRef = useRef(false);
+  const copy = key => t(language, `companion.${key}`);
 
   useEffect(() => {
     let objectUrl;
@@ -169,10 +163,10 @@ export default function AvatarViewer({
     <main className="avatar-companion-view">
       <header className="avatar-companion-header">
         <button type="button" className="avatar-secondary-btn" onClick={returnHome}>
-          <ArrowLeft size={20} /> Return home
+          <ArrowLeft size={20} /> {copy('returnHome')}
         </button>
         <div className={`avatar-status avatar-status-${status}`} role="status" aria-live="polite">
-          <span aria-hidden="true" /> {STATUS_COPY[status]}
+          <span aria-hidden="true" /> {copy(status)}
         </div>
       </header>
 
@@ -197,12 +191,12 @@ export default function AvatarViewer({
         <section className="avatar-conversation-panel" aria-labelledby="avatar-conversation-title">
           <div className="avatar-conversation-heading">
             <div>
-              <h2 id="avatar-conversation-title">Talk with your companion</h2>
-              <p>This supports conversation and activities. It does not provide medical advice or diagnose dementia.</p>
+              <h2 id="avatar-conversation-title">{copy('title')}</h2>
+              <p>{copy('medical')}</p>
             </div>
             {status === 'speaking' && (
               <button type="button" className="avatar-stop-btn" onClick={stopReply}>
-                <VolumeX size={20} /> Stop speaking
+                <VolumeX size={20} /> {copy('stopSpeaking')}
               </button>
             )}
           </div>
@@ -215,7 +209,7 @@ export default function AvatarViewer({
               </article>
             )) : (
               <div className="avatar-empty-transcript">
-                <p>Say hello, share a memory, or ask for a gentle activity.</p>
+                <p>{copy('intro')}</p>
               </div>
             )}
           </div>
@@ -224,12 +218,12 @@ export default function AvatarViewer({
             <div className="avatar-chat-error" role="alert">
               <AlertCircle size={20} />
               <span>{error}</span>
-              {failedPayload && <button type="button" onClick={() => submitPayload(failedPayload)}><RotateCcw size={18} /> Try again</button>}
+              {failedPayload && <button type="button" onClick={() => submitPayload(failedPayload)}><RotateCcw size={18} /> {copy('retry')}</button>}
             </div>
           )}
 
           <form className="avatar-chat-form" onSubmit={submitText}>
-            <label htmlFor="avatar-chat-input">Type a message</label>
+            <label htmlFor="avatar-chat-input">{copy('typeLabel')}</label>
             <div className="avatar-chat-input-row">
               <input
                 id="avatar-chat-input"
@@ -237,10 +231,10 @@ export default function AvatarViewer({
                 onChange={event => setDraft(event.target.value)}
                 maxLength={2000}
                 disabled={status === 'thinking'}
-                placeholder="What would you like to talk about?"
+                placeholder={copy('placeholder')}
               />
               <button type="submit" className="avatar-primary-btn" disabled={!draft.trim() || status === 'thinking'}>
-                <Send size={20} /> Send message
+                <Send size={20} /> {copy('send')}
               </button>
             </div>
           </form>
@@ -252,7 +246,7 @@ export default function AvatarViewer({
             onClick={recording ? stopRecording : startRecording}
           >
             {recording ? <Square size={22} /> : <Mic size={22} />}
-            {recording ? 'Stop recording' : 'Speak a message'}
+            {recording ? copy('stopRecording') : copy('speak')}
           </button>
         </section>
       </div>
