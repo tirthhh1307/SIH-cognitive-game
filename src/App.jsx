@@ -29,6 +29,7 @@ import { getGame } from './data/games';
 import { t, LANGUAGES } from './data/i18n';
 
 const AvatarOnboardingModal = lazy(() => import('./components/avatar/AvatarOnboardingModal'));
+const AvatarViewer = lazy(() => import('./components/avatar/AvatarViewer'));
 
 export default function App() {
   const [platformState, setPlatformState] = useState(() => loadPlatformState(localStorage));
@@ -275,10 +276,18 @@ export default function App() {
           onLanguageChange={handleLanguageChange}
         />
 
-        <AppNav activeView={activeView} onNavigate={setActiveView} language={language} />
+        {activeView !== 'companion' && <AppNav activeView={activeView} onNavigate={setActiveView} language={language} />}
 
         {activeView === 'home' ? (
           <main className="categories-grid-section">
+            <button type="button" className="avatar-companion-entry" onClick={() => setActiveView('companion')}>
+              <img src={avatar} alt="" />
+              <span>
+                <strong>Talk with your companion</strong>
+                <small>Speak or type. Replies are read aloud.</small>
+              </span>
+              <span aria-hidden="true">→</span>
+            </button>
             <div className="categories-grid">
               {categoryCards.map((card) => (
                 <CategoryCard 
@@ -294,6 +303,15 @@ export default function App() {
               ))}
             </div>
           </main>
+        ) : activeView === 'companion' ? (
+          <Suspense fallback={<main className="platform-view placeholder-view"><p>Preparing companion…</p></main>}>
+            <AvatarViewer
+              language={language}
+              profileId="local"
+              staticAvatar={avatar}
+              onReturnHome={() => setActiveView('home')}
+            />
+          </Suspense>
         ) : activeView === 'play' ? (
           <main className="platform-view-shell">
             <GameLibrary stage={profile.stage} onSelectGame={handleSelectLibraryGame} language={language} />
