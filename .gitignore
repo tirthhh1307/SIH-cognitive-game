@@ -4,8 +4,12 @@ dist-ssr/
 .vite/
 *.local
 *.log
+*.py[cod]
+__pycache__/
 .DS_Store
 .vscode/
 .idea/
 graphify-out/
 .worktrees/
+.venv/
+backend/static/
