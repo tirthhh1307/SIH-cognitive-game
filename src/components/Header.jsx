@@ -2,40 +2,106 @@ import React, { useState } from 'react';
 import { Settings, Star, Volume2, VolumeX } from 'lucide-react';
 import { GoldenDivider } from './CulturalPattern';
 import { playClickSound } from '../utils/audio';
+import { t } from '../data/i18n';
+import { getAvatarSrc } from '../data/avatars';
 
 export function Header({ 
   playerName = 'Apoi', 
+  avatar = '/avatars/avatar_apoi.jpg',
   stars = 120, 
   onOpenSettings, 
   onOpenProfile, 
   isMuted, 
-  onToggleMute 
+  onToggleMute,
+  language = 'en',
+  onLanguageChange
 }) {
   const [avatarFailed, setAvatarFailed] = useState(false);
+  const avatarImageSrc = getAvatarSrc(avatar);
+
   return (
     <header className="game-header">
-      <button
-        type="button"
-        className="profile-pill" 
-        onClick={() => { playClickSound(); onOpenProfile(); }}
-        aria-label={`Profile for ${playerName}`}
-      >
-        <div className="avatar-circle">
-          {avatarFailed ? '👵' : <img
-            src="/avatar_apoi.jpg" 
-            alt={playerName} 
-            onError={() => setAvatarFailed(true)}
-          />}
-        </div>
-        <div className="profile-text">
-          <span className="greeting-text">Hello,</span>
-          <span className="player-name">{playerName}</span>
-        </div>
-      </button>
+      <div className="header-left-cluster">
+        <button
+          type="button"
+          className="profile-pill" 
+          onClick={() => { playClickSound(); onOpenProfile(); }}
+          aria-label={`Profile for ${playerName}`}
+          title="Click to customize character and avatar"
+        >
+          <div className="avatar-circle">
+            {avatarFailed ? '👵' : <img
+              src={avatarImageSrc} 
+              alt={playerName} 
+              onError={() => setAvatarFailed(true)}
+            />}
+          </div>
+          <div className="profile-text">
+            <span className="greeting-text">{t(language, 'header.hello')}</span>
+            <span className="player-name">{playerName}</span>
+          </div>
+        </button>
+
+        {onLanguageChange && (
+          <div className="header-lang-selector-box" aria-label={t(language, 'header.language')}>
+            <div className="header-lang-title">
+              <span className="lang-icon">🌐</span>
+              <span className="lang-header-label">{t(language, 'header.language')}</span>
+            </div>
+            <div className="header-lang-pills">
+              <button
+                type="button"
+                className={`lang-badge-btn ${language === 'en' ? 'active-lang' : ''}`}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onLanguageChange('en'); }}
+                title="English"
+              >
+                English
+              </button>
+              <button
+                type="button"
+                className={`lang-badge-btn ${language === 'as' ? 'active-lang' : ''}`}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onLanguageChange('as'); }}
+                title="অসমীয়া (Assamese)"
+              >
+                অসমীয়া
+              </button>
+              <button
+                type="button"
+                className={`lang-badge-btn ${language === 'hi' ? 'active-lang' : ''}`}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onLanguageChange('hi'); }}
+                title="हिन्दी (Hindi)"
+              >
+                हिन्दी
+              </button>
+              <button
+                type="button"
+                className={`lang-badge-btn ${language === 'mni' ? 'active-lang' : ''}`}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onLanguageChange('mni'); }}
+                title="মৈতৈলোন্ (Manipuri)"
+              >
+                মৈতৈলোন্
+              </button>
+              <button
+                type="button"
+                className={`lang-badge-btn ${language === 'trp' ? 'active-lang' : ''}`}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); onLanguageChange('trp'); }}
+                title="ককবরক (Tripuri)"
+              >
+                ককবরক
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="welcome-center">
-        <h1 className="welcome-title">Welcome!</h1>
-        <p className="welcome-subtitle">Let&apos;s have a fun and happy day!</p>
+        <div className="app-brand-pill">
+          <span className="brand-dot">🌱</span>
+          <span className="brand-name-tag">Sanjibani</span>
+          <span className="brand-badge-sub">Cognitive Companion</span>
+        </div>
+        <h1 className="welcome-title">{t(language, 'header.welcome')}</h1>
+        <p className="welcome-subtitle">{t(language, 'header.subtitle')}</p>
         <GoldenDivider />
       </div>
 
@@ -58,7 +124,7 @@ export function Header({
             </div>
             <div className="stars-text-block">
               <span className="stars-count">{stars}</span>
-              <span className="stars-label">Stars</span>
+              <span className="stars-label">{t(language, 'header.stars')}</span>
             </div>
           </div>
 

@@ -4,11 +4,14 @@ import { playClickSound, setSoundVolume, setNatureVolume, startNatureAmbience, s
 import { setVoiceEnabled, speakText } from '../utils/speech';
 import { LANGUAGES } from '../data/i18n';
 import { SCENIC_BACKGROUNDS } from '../data/scenicBackgrounds';
+import { AVATAR_OPTIONS, getAvatarSrc } from '../data/avatars';
 
 export function SettingsModal({
   onClose,
   playerName,
   setPlayerName,
+  avatar = '/avatars/avatar_apoi.jpg',
+  setAvatar,
   fontSize,
   setFontSize,
   highContrast,
@@ -99,21 +102,51 @@ export function SettingsModal({
 
           <div className="settings-section">
             <h3 className="section-heading">
-              <User size={20} /> Player Profile
+              <User size={20} /> Player Character & Avatar
             </h3>
-            <form onSubmit={handleSaveProfile} className="profile-edit-row">
-              <input 
-                type="text" 
-                value={tempName} 
-                onChange={e => setTempName(e.target.value)}
-                placeholder="Enter player name"
-                className="name-input"
-                maxLength={20}
-              />
-              <button type="submit" className="save-name-btn">
-                <Check size={18} /> Update
-              </button>
-            </form>
+            <div className="settings-avatar-row">
+              <div className="settings-avatar-preview">
+                <img src={getAvatarSrc(avatar)} alt={tempName} />
+              </div>
+              <form onSubmit={handleSaveProfile} className="profile-edit-row">
+                <input 
+                  type="text" 
+                  value={tempName} 
+                  onChange={e => setTempName(e.target.value)}
+                  placeholder="Enter player name"
+                  className="name-input"
+                  maxLength={20}
+                />
+                <button type="submit" className="save-name-btn">
+                  <Check size={18} /> Update
+                </button>
+              </form>
+            </div>
+            
+            <div className="settings-avatar-grid">
+              {AVATAR_OPTIONS.map((av) => {
+                const isSelected = avatar === av.src || (av.id === 'apoi' && (!avatar || avatar === '/avatar_apoi.jpg'));
+                return (
+                  <button
+                    key={av.id}
+                    type="button"
+                    className={`settings-avatar-chip ${isSelected ? 'selected' : ''}`}
+                    onClick={() => {
+                      playClickSound();
+                      if (setAvatar) setAvatar(av.src);
+                      if (!tempName || tempName === 'Apoi' || tempName === 'Player') {
+                        setTempName(av.defaultName);
+                        setPlayerName(av.defaultName);
+                      }
+                    }}
+                    title={av.style}
+                  >
+                    <img src={av.src} alt={av.name} />
+                    <span>{av.defaultName}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="settings-section">

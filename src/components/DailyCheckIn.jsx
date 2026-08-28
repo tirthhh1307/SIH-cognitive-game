@@ -33,7 +33,7 @@ export function DailyCheckIn({ state, onStateChange, language = 'en' }) {
     const reminder = due[0];
     setNotificationMessage(`Reminder: ${reminder.label}`);
     if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('Apon Mon reminder', { body: reminder.label });
+      new Notification('Sanjibani reminder', { body: reminder.label });
     }
     onStateChange(previous => upsertReminder(previous, { ...reminder, lastShownDate: localDate(now) }));
   }, [due.map(({ id }) => id).join(','), now.getMinutes()]);

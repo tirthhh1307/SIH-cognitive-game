@@ -8,14 +8,14 @@ const expectedIds = [
   'odd-one-out', 'naming-game', 'category-sorting', 'routine-sequence',
   'task-simulation', 'family-face-match', 'voice-recognition',
   'emotion-recognition', 'festival-match', 'folk-story-sequence',
-  'local-music-recall', 'spot-difference', 'tap-target',
-  'word-association', 'proverb-completion', 'color-tap',
+  'local-music-recall', 'spot-difference', 'tap-target', 'table-object-pickup',
+  'sticky-number-order', 'word-association', 'proverb-completion', 'color-tap',
   'sound-match', 'yes-no-recognition'
 ];
 
-test('catalog contains all 26 unique documented games', () => {
+test('catalog contains all 28 unique documented games', () => {
   assert.deepEqual(GAMES.map(({ id }) => id).sort(), expectedIds.sort());
-  assert.equal(new Set(GAMES.map(({ id }) => id)).size, 26);
+  assert.equal(new Set(GAMES.map(({ id }) => id)).size, 28);
 });
 
 test('every game config is runnable', () => {
@@ -33,7 +33,7 @@ test('every engine has configured games and each game has three playable records
 });
 
 test('documented category count and stage coverage remain complete', () => {
-  assert.equal(new Set(GAMES.map(({ category }) => category)).size, 10);
+  assert.equal(new Set(GAMES.map(({ category }) => category)).size, 9);
   for (const stage of ['mild', 'moderate', 'severe']) {
     assert.ok(GAMES.some(({ stages }) => stages.includes(stage)), `${stage} needs games`);
   }

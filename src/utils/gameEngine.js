@@ -34,3 +34,36 @@ export function scoreRound(correct, total) {
   const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
   return { accuracy, score: accuracy };
 }
+
+export const MOTIVATIONAL_QUOTES = [
+  "Every step forward is a victory for the heart and mind! 🌟",
+  "Your memory is like a blooming garden, growing stronger every day! 🌸",
+  "Brilliant focus and determination! You did wonderfully! ✨",
+  "A happy mind brings a joyful day. Fantastic achievement! 💖",
+  "You are making outstanding progress, keep smiling and shining! ☀️",
+  "Celebrating your sharp memory and wonderful effort! 🎉"
+];
+
+export const RETRY_ENCOURAGEMENT_QUOTES = [
+  "Take your time and take a deep breath. You can do this! 🌿",
+  "Every attempt makes your memory sharper. Let's try again with joy! 💫",
+  "Mistakes are just gentle steps on our path of learning. You've got this! 🌼",
+  "Believe in yourself! Take another look and give it another try. 🌈",
+  "Practice brings confidence and peace. Let's try one more time! 🌻"
+];
+
+export function getRandomQuote(quotes) {
+  return quotes[Math.floor(Math.random() * quotes.length)];
+}
+
+export function createJigsawGrid(rows, cols) {
+  const pieces = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const index = r * cols + c;
+      pieces.push({ id: index, row: r, col: c, currentPos: index });
+    }
+  }
+  return pieces;
+}
+

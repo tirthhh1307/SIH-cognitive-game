@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 
 test('manifest provides standalone install metadata', async () => {
   const manifest = JSON.parse(await readFile('public/manifest.webmanifest', 'utf8'));
-  assert.equal(manifest.name, 'Apon Mon Cognitive Companion');
+  assert.equal(manifest.name, 'Sanjibani Cognitive Companion');
   assert.equal(manifest.display, 'standalone');
   assert.equal(manifest.start_url, '/');
   assert.ok(manifest.icons.some(icon => icon.src === '/app-icon.svg'));

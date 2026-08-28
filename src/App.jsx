@@ -22,13 +22,16 @@ import { DailyCheckIn } from './components/DailyCheckIn';
 import { MemoryAnchors } from './components/MemoryAnchors';
 import { clearAnchors, listAnchors } from './utils/mediaStore';
 import { CaregiverDashboard } from './components/CaregiverDashboard';
+import { ProfileModal } from './components/ProfileModal';
 import { getGame } from './data/games';
+import { t, LANGUAGES } from './data/i18n';
 
 export default function App() {
   const [platformState, setPlatformState] = useState(() => loadPlatformState(localStorage));
   const [activeView, setActiveView] = useState('home');
   const [activeModal, setActiveModal] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [starNotification, setStarNotification] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
   const [togetherMode, setTogetherMode] = useState(false);
@@ -37,6 +40,7 @@ export default function App() {
   const { profile, settings, stars } = platformState;
   const playerName = profile.name;
   const language = profile.language;
+  const avatar = profile.avatar || '/avatars/avatar_apoi.jpg';
 
   useEffect(() => {
     document.documentElement.lang = language === 'as' ? 'as' : 'en';
@@ -181,35 +185,64 @@ export default function App() {
     return () => clearInterval(interval);
   }, [scenicAutoSlide]);
 
+  const languageOptions = [
+    { code: 'en', label: 'English', sub: 'English', flag: '🇬🇧' },
+    { code: 'as', label: 'অসমীয়া', sub: 'Assamese', flag: '🇮🇳' },
+    { code: 'hi', label: 'हिन्दी', sub: 'Hindi', flag: '🇮🇳' },
+    { code: 'mni', label: 'মৈতৈলোন্', sub: 'Manipuri', flag: '🇮🇳' },
+    { code: 'trp', label: 'ককবরক', sub: 'Tripuri', flag: '🇮🇳' }
+  ];
+
+  const handleLanguageChange = (newLang) => {
+    try {
+      playClickSound();
+    } catch {}
+    setPlatformState(prev => {
+      const next = {
+        ...prev,
+        profile: {
+          ...prev.profile,
+          language: newLang
+        }
+      };
+      savePlatformState(next, localStorage);
+      return next;
+    });
+    try {
+      const welcomeMsg = t(newLang, 'speech.welcome');
+      speakText(welcomeMsg, null, newLang);
+    } catch {}
+  };
+
   const categoryCards = [
     {
       id: 'mind-games',
-      title: 'Mind Games',
-      description: 'Fun games to exercise your mind',
+      title: t(language, 'card.mindGames.title'),
+      description: t(language, 'card.mindGames.desc'),
       icon: BrainSunburstIcon,
       gradientClass: 'card-orange',
       arrowColor: '#FF7A00'
     },
     {
       id: 'memory-garden',
-      title: 'Memory Garden',
-      description: 'Activities to help your memory',
+      title: t(language, 'card.memoryGarden.title'),
+      description: t(language, 'card.memoryGarden.desc'),
       icon: SproutGardenIcon,
       gradientClass: 'card-green',
       arrowColor: '#558B2F'
     },
     {
       id: 'music-joy',
-      title: 'Music & Joy',
-      description: 'Songs and sounds to lift your spirit',
+      title: t(language, 'card.musicJoy.title'),
+      description: t(language, 'card.musicJoy.desc'),
       icon: MusicNotesIcon,
       gradientClass: 'card-blue',
       arrowColor: '#0277BD'
     },
     {
       id: 'stories-memories',
-      title: 'Stories & Memories',
-      description: 'Revisit beautiful moments',
+      title: t(language, 'card.storiesMemories.title'),
+      description: t(language, 'card.storiesMemories.desc'),
       icon: PhotoMemoryIcon,
       gradientClass: 'card-purple',
       arrowColor: '#6A1B9A'
@@ -225,11 +258,14 @@ export default function App() {
       <div className="main-game-container">
         <Header 
           playerName={playerName}
+          avatar={avatar}
           stars={stars}
           onOpenSettings={() => setShowSettings(true)}
-          onOpenProfile={() => setShowSettings(true)}
+          onOpenProfile={() => setShowProfileModal(true)}
           isMuted={settings.muted}
           onToggleMute={handleToggleMute}
+          language={language}
+          onLanguageChange={handleLanguageChange}
         />
 
         <AppNav activeView={activeView} onNavigate={setActiveView} language={language} />
@@ -311,11 +347,24 @@ export default function App() {
         <StoriesMemoriesModal onClose={handleCloseModal} onEarnStars={handleEarnStars} />
       )}
 
+      {showProfileModal && (
+        <ProfileModal
+          onClose={() => setShowProfileModal(false)}
+          playerName={playerName}
+          setPlayerName={(name) => setPlatformState(prev => ({ ...prev, profile: { ...prev.profile, name } }))}
+          currentAvatar={avatar}
+          setAvatar={(newAvatar) => setPlatformState(prev => ({ ...prev, profile: { ...prev.profile, avatar: newAvatar } }))}
+          language={language}
+        />
+      )}
+
       {showSettings && (
         <SettingsModal 
           onClose={() => setShowSettings(false)}
           playerName={playerName}
           setPlayerName={(name) => setPlatformState(prev => ({ ...prev, profile: { ...prev.profile, name } }))}
+          avatar={avatar}
+          setAvatar={(newAvatar) => setPlatformState(prev => ({ ...prev, profile: { ...prev.profile, avatar: newAvatar } }))}
           fontSize={settings.fontSize}
           setFontSize={(fontSize) => setPlatformState(prev => ({ ...prev, settings: { ...prev.settings, fontSize } }))}
           highContrast={settings.highContrast}
