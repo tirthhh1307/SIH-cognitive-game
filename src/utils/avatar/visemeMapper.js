@@ -10,6 +10,20 @@ export const RHUBARB_MORPH_MAP = {
   H: { jawOpen: 0.35, mouthPucker: 0.0, mouthSmile: 0.4, mouthFunnel: 0.0, mouthClose: 0.0 }
 };
 
+export const MORPH_ALIASES = {
+  jawOpen: ['jawOpen', 'Face_Blendshape.Fcl_MTH_A', 'Face_Blendshape.Fcl_MTH_Large'],
+  mouthPucker: ['mouthPucker', 'Face_Blendshape.Fcl_MTH_U'],
+  mouthFunnel: ['mouthFunnel', 'Face_Blendshape.Fcl_MTH_O'],
+  mouthSmile: ['mouthSmile', 'Face_Blendshape.Fcl_MTH_Joy'],
+  mouthClose: ['mouthClose', 'Face_Blendshape.Fcl_MTH_Close'],
+  eyeBlinkLeft: ['eyeBlinkLeft', 'Face_Blendshape.Fcl_EYE_Close_L'],
+  eyeBlinkRight: ['eyeBlinkRight', 'Face_Blendshape.Fcl_EYE_Close_R']
+};
+
+export function resolveMorphIndex(dictionary, name) {
+  return MORPH_ALIASES[name]?.map(alias => dictionary[alias]).find(Number.isInteger);
+}
+
 export function getBlendshapeWeights(visemes, currentTime, transitionWindow = 0.06) {
   if (!Array.isArray(visemes) || visemes.length === 0) {
     return { ...RHUBARB_MORPH_MAP.X };
