@@ -27,11 +27,12 @@ const LANG_FALLBACK_CODES = {
   trp: ['trp-IN', 'trp', 'bn-IN', 'bn', 'hi-IN', 'en-IN']
 };
 
-export function speakText(text, onEnd = null, language = 'en') {
+export function speakText(text, onEnd = null, language = 'en', events = {}) {
   try {
     if (!isVoiceEnabled || !('speechSynthesis' in window)) {
+      events.onError?.();
       if (onEnd) onEnd();
-      return;
+      return null;
     }
 
     window.speechSynthesis.cancel();
@@ -95,14 +96,26 @@ export function speakText(text, onEnd = null, language = 'en') {
       utterance.voice = matchedVoice;
     }
 
-    if (onEnd) {
-      utterance.onend = onEnd;
-      utterance.onerror = onEnd;
-    }
+    let finished = false;
+    const finish = callback => event => {
+      callback?.(event);
+      if (!finished) {
+        finished = true;
+        onEnd?.();
+      }
+    };
+
+    utterance.onstart = event => events.onStart?.(event);
+    utterance.onboundary = event => events.onBoundary?.(event, text);
+    utterance.onend = finish(events.onEnd);
+    utterance.onerror = finish(events.onError);
 
     window.speechSynthesis.speak(utterance);
+    return utterance;
   } catch {
+    events.onError?.();
     if (onEnd) onEnd();
+    return null;
   }
 }
 
