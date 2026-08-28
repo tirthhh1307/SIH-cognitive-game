@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { CategoryCard } from './components/CategoryCard';
 import { BottomBanner } from './components/BottomBanner';
+import { WeatherWidget } from './components/WeatherWidget';
+import { PositiveNewsWidget } from './components/PositiveNewsWidget';
 import { SceneryInteractive } from './components/SceneryInteractive';
 import { ScenicBackdrop } from './components/ScenicBackdrop';
 import { SCENIC_BACKGROUNDS } from './data/scenicBackgrounds';
@@ -318,8 +320,20 @@ export default function App() {
           </main>
         )}
 
-        <footer className="footer-banner-section">
-          <BottomBanner />
+        <footer className={`footer-banner-section ${activeView === 'home' ? 'footer-home-layout' : ''}`}>
+          {activeView === 'home' && (
+            <div className="home-footer-left">
+              <WeatherWidget language={language} />
+            </div>
+          )}
+          <div className="home-footer-center">
+            <BottomBanner />
+          </div>
+          {activeView === 'home' && (
+            <div className="home-footer-right">
+              <PositiveNewsWidget language={language} />
+            </div>
+          )}
         </footer>
       </div>
 

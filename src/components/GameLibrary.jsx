@@ -6,7 +6,7 @@ import { gameName, t } from '../data/i18n';
 export function GameLibrary({ stage, onSelectGame, language = 'en' }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
-  const [stageFilter, setStageFilter] = useState(stage);
+  const [stageFilter, setStageFilter] = useState('all');
   const [together, setTogether] = useState(false);
 
   const visibleGames = useMemo(() => {
