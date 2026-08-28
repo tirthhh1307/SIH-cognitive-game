@@ -1,18 +1,34 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseRhubarbOutput } from '../src/utils/avatar/audioSyncEngine.js';
-import { getBlendshapeWeights } from '../src/utils/avatar/visemeMapper.js';
+import { sendChat } from '../src/utils/avatar/chatApi.js';
+import { createSpeechVisemeEvents } from '../src/utils/avatar/speechVisemes.js';
 
-test('end-to-end payload transforms to active blendshapes', () => {
-  const backendResponse = {
-    audioUrl: 'http://localhost:8000/static/audio/test.wav',
-    visemes: [
-      { start: 0.0, end: 0.5, value: 'X' },
-      { start: 0.5, end: 1.2, value: 'D' }
-    ]
-  };
+test('text chat response drives accessibility-speech mouth movement', async () => {
+  let submittedForm;
+  const response = await sendChat(
+    { text: 'Hello', history: [], profileId: 'local' },
+    {
+      fetchImpl: async (_url, request) => {
+        submittedForm = request.body;
+        return {
+          ok: true,
+          json: async () => ({ inputText: 'Hello', text: 'Hello. It is good to hear from you.' })
+        };
+      }
+    }
+  );
 
-  const parsed = parseRhubarbOutput(backendResponse.visemes);
-  const weights = getBlendshapeWeights(parsed, 0.8);
-  assert.ok(weights.jawOpen > 0.5);
+  assert.equal(submittedForm.get('text'), 'Hello');
+  assert.equal(submittedForm.has('photos'), false);
+  assert.equal(response.text, 'Hello. It is good to hear from you.');
+
+  const updates = [];
+  const events = createSpeechVisemeEvents(weights => updates.push(weights), {
+    setTimeout: () => 1,
+    clearTimeout: () => {}
+  });
+  events.onBoundary({ charIndex: 0 }, response.text);
+  assert.ok(updates.at(-1).jawOpen > 0);
+  events.onEnd();
+  assert.equal(updates.at(-1).jawOpen, 0);
 });

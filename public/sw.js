@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cognitive-platform-shell-v1';
+const CACHE_NAME = 'cognitive-platform-shell-v2';
 const SHELL_FILES = ['/', '/index.html', '/manifest.webmanifest', '/app-icon.svg', '/avatar_apoi.jpg', '/scenic_bg.jpg'];
 
 self.addEventListener('install', event => {
@@ -26,7 +26,8 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
   const staticDestinations = ['document', 'script', 'style', 'image', 'font'];
-  if (event.request.mode !== 'navigate' && !staticDestinations.includes(event.request.destination)) return;
+  const isAvatarModel = url.pathname.startsWith('/models/');
+  if (event.request.mode !== 'navigate' && !isAvatarModel && !staticDestinations.includes(event.request.destination)) return;
   event.respondWith((async () => {
     const cached = await caches.match(event.request);
     if (cached) return cached;

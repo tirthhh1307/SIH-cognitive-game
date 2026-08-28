@@ -24,7 +24,8 @@ class FakeTranscriber:
         assert content_type == "audio/webm"
         return "Hello there"
 
-def test_health():
+def test_health(monkeypatch):
+    monkeypatch.setattr("backend.app.rhubarb_available", lambda: False)
     app.state.gemini = type("Gemini", (), {"configured": False})()
     app.state.transcriber = type("Transcriber", (), {"available": True})()
     response = client.get("/health")

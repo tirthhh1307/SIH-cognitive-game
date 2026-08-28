@@ -53,6 +53,7 @@ export default function AvatarCanvas({
     let currentModel;
     let customTexture;
     let frameId;
+    let disposed = false;
     let blinkStartedAt = 0;
     let nextBlinkAt = 2.8;
     const clock = new THREE.Clock();
@@ -60,6 +61,10 @@ export default function AvatarCanvas({
     const applyTexture = model => {
       if (!textureUrl) return;
       new THREE.TextureLoader().load(textureUrl, texture => {
+        if (disposed) {
+          texture.dispose();
+          return;
+        }
         customTexture = texture;
         texture.flipY = false;
         texture.colorSpace = THREE.SRGBColorSpace;
@@ -77,6 +82,14 @@ export default function AvatarCanvas({
     new GLTFLoader().load(
       modelUrl,
       gltf => {
+        if (disposed) {
+          gltf.scene.traverse(child => {
+            child.geometry?.dispose();
+            const materials = Array.isArray(child.material) ? child.material : [child.material];
+            materials.filter(Boolean).forEach(material => material.dispose());
+          });
+          return;
+        }
         currentModel = gltf.scene;
         scene.add(currentModel);
         currentModel.traverse(child => {
@@ -152,6 +165,7 @@ export default function AvatarCanvas({
     document.addEventListener('visibilitychange', resume);
 
     return () => {
+      disposed = true;
       if (frameId) cancelAnimationFrame(frameId);
       window.removeEventListener('resize', resize);
       document.removeEventListener('visibilitychange', resume);

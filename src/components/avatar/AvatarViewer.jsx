@@ -66,6 +66,7 @@ export default function AvatarViewer({
 
   const finishSpeaking = () => {
     speechEventsRef.current?.onEnd();
+    if (disposedRef.current) return;
     setStatus('ready');
   };
 

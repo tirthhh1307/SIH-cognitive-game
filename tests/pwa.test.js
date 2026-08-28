@@ -15,6 +15,7 @@ test('service worker installs the complete offline shell', async () => {
   const worker = await readFile('public/sw.js', 'utf8');
   const handlers = {};
   let installedFiles = [];
+  let cachedModel = false;
   const context = {
     self: {
       location: { origin: 'https://example.test' },
@@ -23,7 +24,10 @@ test('service worker installs the complete offline shell', async () => {
       clients: { claim: () => Promise.resolve() }
     },
     caches: {
-      open: async () => ({ addAll: async files => { installedFiles.push(...files); } }),
+      open: async () => ({
+        addAll: async files => { installedFiles.push(...files); },
+        put: async request => { cachedModel = request.url.endsWith('/models/avatar-companion.vrm'); }
+      }),
       keys: async () => [],
       delete: async () => true,
       match: async () => undefined
@@ -48,4 +52,18 @@ test('service worker installs the complete offline shell', async () => {
     respondWith: () => { interceptedApi = true; }
   });
   assert.equal(interceptedApi, false);
+  assert.equal(installedFiles.includes('/models/avatar-companion.vrm'), false);
+
+  let modelResponse;
+  handlers.fetch({
+    request: {
+      method: 'GET',
+      url: 'https://example.test/models/avatar-companion.vrm',
+      destination: '',
+      mode: 'cors'
+    },
+    respondWith: promise => { modelResponse = promise; }
+  });
+  await modelResponse;
+  assert.equal(cachedModel, true);
 });
