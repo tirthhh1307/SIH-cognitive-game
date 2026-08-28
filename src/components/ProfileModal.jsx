@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { X, Check, User, Sparkles, Heart } from 'lucide-react';
+import { X, Check, User, Sparkles, Heart, Camera } from 'lucide-react';
 import { AVATAR_OPTIONS, getAvatarSrc } from '../data/avatars';
 import { playClickSound, playSuccessSound } from '../utils/audio';
 import { speakText } from '../utils/speech';
 import { t } from '../data/i18n';
+import AvatarOnboardingModal from './avatar/AvatarOnboardingModal';
 
 export function ProfileModal({
   onClose,
@@ -16,6 +17,7 @@ export function ProfileModal({
   const [tempName, setTempName] = useState(playerName);
   const [selectedAvatar, setSelectedAvatar] = useState(currentAvatar || '/avatars/avatar_apoi.jpg');
   const [filterGender, setFilterGender] = useState('all');
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const filteredAvatars = AVATAR_OPTIONS.filter(av => {
     if (filterGender === 'all') return true;
@@ -102,6 +104,26 @@ export function ProfileModal({
             </div>
           </div>
 
+          {/* 3D Custom Avatar Creator Trigger */}
+          <div className="my-3 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-400/20 flex items-center justify-center text-amber-300">
+                <Camera size={20} />
+              </div>
+              <div>
+                <h4 className="font-bold text-amber-200 text-sm">Create 3D Cartoon Avatar</h4>
+                <p className="text-xs text-emerald-200">Snap 3 photos & 5s voice to clone your likeness</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowOnboarding(true)}
+              className="px-3.5 py-2 bg-amber-400 hover:bg-amber-300 text-emerald-950 font-bold text-xs rounded-xl shadow transition"
+            >
+              Start 3D Studio
+            </button>
+          </div>
+
           {/* Gender Filter Tabs */}
           <div className="avatar-filter-tabs">
             <button
@@ -166,6 +188,15 @@ export function ProfileModal({
           </button>
         </div>
       </div>
+
+      <AvatarOnboardingModal
+        isOpen={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        onComplete={(payload) => {
+          console.log('Custom 3D Avatar enrollment completed:', payload);
+          setShowOnboarding(false);
+        }}
+      />
     </div>
   );
 }
