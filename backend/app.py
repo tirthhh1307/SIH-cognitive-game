@@ -7,7 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from backend.services.gemini_service import GeminiService
 from backend.services.stt_service import SUFFIXES, WhisperTranscriber
-from backend.services.tts_service import VoiceCloneEngine
+from backend.services.tts_service import ChatterboxAdapter
+from backend.services.viseme_service import rhubarb_available
 
 
 MAX_AUDIO_BYTES = 10 * 1024 * 1024
@@ -23,15 +24,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-tts_engine = VoiceCloneEngine()
 app.state.gemini = GeminiService()
 app.state.transcriber = WhisperTranscriber()
+app.state.voice = ChatterboxAdapter()
 
 @app.post("/api/voice/enroll")
 async def enroll_voice(profile_id: str = Form(...), file: UploadFile = File(...)):
-    contents = await file.read()
-    path = tts_engine.enroll_voice(profile_id, contents)
-    return {"status": "enrolled", "profile_id": profile_id, "ref_path": path}
+    del profile_id, file
+    raise HTTPException(status_code=503, detail="Voice cloning is disabled.")
 
 @app.post("/api/chat/interact")
 async def chat_interact(
@@ -88,4 +88,10 @@ async def chat_interact(
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "gpu_vram_limit": "6GB"}
+    return {
+        "status": "ok",
+        "geminiConfigured": app.state.gemini.configured,
+        "whisperAvailable": app.state.transcriber.available,
+        "chatterboxEnabled": app.state.voice.enabled,
+        "rhubarbAvailable": rhubarb_available(),
+    }

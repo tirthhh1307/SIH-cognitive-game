@@ -25,9 +25,17 @@ class FakeTranscriber:
         return "Hello there"
 
 def test_health():
+    app.state.gemini = type("Gemini", (), {"configured": False})()
+    app.state.transcriber = type("Transcriber", (), {"available": True})()
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json()["status"] == "ok"
+    assert response.json() == {
+        "status": "ok",
+        "geminiConfigured": False,
+        "whisperAvailable": True,
+        "chatterboxEnabled": False,
+        "rhubarbAvailable": False,
+    }
 
 def test_text_chat_returns_gemini_reply():
     app.state.gemini = FakeGemini()
@@ -53,12 +61,12 @@ def test_audio_chat_transcribes_on_cpu():
     assert response.status_code == 200
     assert response.json()["inputText"] == "Hello there"
 
-def test_voice_enroll():
+def test_voice_enrollment_is_disabled():
     dummy_wav = io.BytesIO(b"RIFF....WAVEfmt ....data....")
     response = client.post(
         "/api/voice/enroll",
         data={"profile_id": "test_user"},
         files={"file": ("test.wav", dummy_wav, "audio/wav")}
     )
-    assert response.status_code == 200
-    assert response.json()["status"] == "enrolled"
+    assert response.status_code == 503
+    assert "disabled" in response.json()["detail"].lower()
