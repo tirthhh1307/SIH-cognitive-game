@@ -252,12 +252,12 @@ export default function App() {
   ];
 
   return (
-    <div className={`app-root view-${activeView} font-size-${settings.fontSize} ${settings.highContrast ? 'high-contrast' : ''}`}>
+    <div className={`app-root font-size-${settings.fontSize} ${settings.highContrast ? 'high-contrast' : ''}`}>
       <ScenicBackdrop activeIndex={scenicBgIndex} />
 
       {activeView === 'home' && <SceneryInteractive onEarnStars={handleEarnStars} />}
 
-      <div className={`main-game-container ${activeView === 'home' ? 'main-container-home' : ''}`}>
+      <div className="main-game-container">
         <Header 
           playerName={playerName}
           avatar={avatar}
