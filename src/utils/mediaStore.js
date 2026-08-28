@@ -1,5 +1,6 @@
 const DB_NAME = 'cognitive-platform-media';
-const STORE_NAME = 'anchors';
+const ANCHOR_STORE = 'anchors';
+const AVATAR_STORE = 'avatar';
 let databasePromise;
 
 export function validateAnchorInput(anchor) {
@@ -24,10 +25,13 @@ function openDatabase() {
       reject(new Error('IndexedDB unavailable'));
       return;
     }
-    const request = indexedDB.open(DB_NAME, 1);
+    const request = indexedDB.open(DB_NAME, 2);
     request.onupgradeneeded = () => {
-      if (!request.result.objectStoreNames.contains(STORE_NAME)) {
-        request.result.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      if (!request.result.objectStoreNames.contains(ANCHOR_STORE)) {
+        request.result.createObjectStore(ANCHOR_STORE, { keyPath: 'id' });
+      }
+      if (!request.result.objectStoreNames.contains(AVATAR_STORE)) {
+        request.result.createObjectStore(AVATAR_STORE, { keyPath: 'id' });
       }
     };
     request.onsuccess = () => resolve(request.result);
@@ -36,11 +40,11 @@ function openDatabase() {
   return databasePromise;
 }
 
-async function requestFromStore(mode, run) {
+async function requestFromStore(storeName, mode, run) {
   const database = await openDatabase();
   return new Promise((resolve, reject) => {
-    const transaction = database.transaction(STORE_NAME, mode);
-    const request = run(transaction.objectStore(STORE_NAME));
+    const transaction = database.transaction(storeName, mode);
+    const request = run(transaction.objectStore(storeName));
     transaction.oncomplete = () => resolve(request?.result);
     transaction.onerror = () => reject(transaction.error);
     transaction.onabort = () => reject(transaction.error ?? new Error('Media transaction aborted'));
@@ -48,21 +52,35 @@ async function requestFromStore(mode, run) {
 }
 
 export async function listAnchors() {
-  return (await requestFromStore('readonly', store => store.getAll())) ?? [];
+  return (await requestFromStore(ANCHOR_STORE, 'readonly', store => store.getAll())) ?? [];
 }
 
 export async function putAnchor(anchor) {
   const error = validateAnchorInput(anchor);
   if (error) throw new Error(error);
   const normalized = { ...anchor, name: anchor.name.trim(), relationship: anchor.relationship.trim() };
-  await requestFromStore('readwrite', store => store.put(normalized));
+  await requestFromStore(ANCHOR_STORE, 'readwrite', store => store.put(normalized));
   return normalized;
 }
 
 export async function deleteAnchor(id) {
-  await requestFromStore('readwrite', store => store.delete(id));
+  await requestFromStore(ANCHOR_STORE, 'readwrite', store => store.delete(id));
 }
 
 export async function clearAnchors() {
-  await requestFromStore('readwrite', store => store.clear());
+  await requestFromStore(ANCHOR_STORE, 'readwrite', store => store.clear());
+}
+
+export async function getAvatarMedia() {
+  return (await requestFromStore(AVATAR_STORE, 'readonly', store => store.get('current'))) ?? null;
+}
+
+export async function putAvatarMedia(profile) {
+  const record = { ...profile, id: 'current', updatedAt: new Date().toISOString() };
+  await requestFromStore(AVATAR_STORE, 'readwrite', store => store.put(record));
+  return record;
+}
+
+export async function clearAvatarMedia() {
+  await requestFromStore(AVATAR_STORE, 'readwrite', store => store.clear());
 }

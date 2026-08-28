@@ -1,166 +1,316 @@
-import React, { useState, useRef } from 'react';
-import { Camera, Mic, CheckCircle, RefreshCw, X } from 'lucide-react';
-import { validatePhotoSet, validateVoiceSample } from '../../utils/avatar/cameraHelper.js';
+import React, { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { animate, eases } from 'animejs';
+import { Camera, CheckCircle, Mic, Square, Upload, X } from 'lucide-react';
+import { createFaceTexture, validateAvatarMedia, validateVoiceSample } from '../../utils/avatar/cameraHelper.js';
+import { putAvatarMedia } from '../../utils/mediaStore.js';
+
+const AvatarCanvas = lazy(() => import('./AvatarCanvas.jsx'));
+
+const ANGLES = ['front', 'left', 'right'];
 
 export default function AvatarOnboardingModal({ isOpen, onClose, onComplete }) {
-  const [step, setStep] = useState(1); // 1: Photos, 2: Voice, 3: Processing
+  const [step, setStep] = useState(0);
   const [photos, setPhotos] = useState({ front: null, left: null, right: null });
   const [activeAngle, setActiveAngle] = useState('front');
+  const [appearance, setAppearance] = useState({ skin: 'medium', hair: 'silver' });
+  const [voiceConsent, setVoiceConsent] = useState(false);
+  const [voiceBlob, setVoiceBlob] = useState(null);
+  const [voiceDuration, setVoiceDuration] = useState(0);
+  const [previewTexture, setPreviewTexture] = useState(null);
   const [recording, setRecording] = useState(false);
-  const [recordTime, setRecordTime] = useState(0);
-  const [audioBlob, setAudioBlob] = useState(null);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState('');
   const videoRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
+  const stepRef = useRef(null);
+  const streamRef = useRef(null);
+  const recorderRef = useRef(null);
+  const chunksRef = useRef([]);
+  const recordStartedRef = useRef(0);
+  const stopTimerRef = useRef();
+  const tickTimerRef = useRef();
+
+  const photoUrls = useMemo(() => Object.fromEntries(
+    ANGLES.map(angle => [angle, photos[angle] ? URL.createObjectURL(photos[angle]) : ''])
+  ), [photos]);
+  const previewTextureUrl = useMemo(() => previewTexture ? URL.createObjectURL(previewTexture) : '', [previewTexture]);
+
+  useEffect(() => () => Object.values(photoUrls).filter(Boolean).forEach(URL.revokeObjectURL), [photoUrls]);
+  useEffect(() => () => { if (previewTextureUrl) URL.revokeObjectURL(previewTextureUrl); }, [previewTextureUrl]);
+
+  const stopCamera = () => {
+    streamRef.current?.getTracks().forEach(track => track.stop());
+    streamRef.current = null;
+    setCameraActive(false);
+  };
+
+  const stopRecording = () => {
+    clearTimeout(stopTimerRef.current);
+    clearInterval(tickTimerRef.current);
+    if (recorderRef.current?.state === 'recording') recorderRef.current.stop();
+    recorderRef.current?.stream?.getTracks().forEach(track => track.stop());
+    setRecording(false);
+  };
+
+  useEffect(() => () => {
+    stopCamera();
+    stopRecording();
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen || !stepRef.current || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    animate(stepRef.current, {
+      opacity: { from: 0 },
+      y: { from: 8 },
+      duration: 180,
+      ease: eases.outQuart
+    });
+  }, [isOpen, step]);
+
+  useEffect(() => {
+    if (!cameraActive || !videoRef.current || !streamRef.current) return;
+    videoRef.current.srcObject = streamRef.current;
+    videoRef.current.play().catch(() => setError('Camera preview is unavailable. Choose a photo instead.'));
+  }, [cameraActive, activeAngle]);
+
+  useEffect(() => {
+    if (step !== 2 || !photos.front) return;
+    let active = true;
+    createFaceTexture(photos.front)
+      .then(texture => { if (active) setPreviewTexture(texture); })
+      .catch(textureError => { if (active) setError(textureError.message); });
+    return () => { active = false; };
+  }, [step, photos.front]);
 
   if (!isOpen) return null;
 
-  const startCamera = async () => {
+  const closeDialog = () => {
+    stopCamera();
+    stopRecording();
+    setStep(0);
+    setPhotos({ front: null, left: null, right: null });
+    setVoiceConsent(false);
+    setVoiceBlob(null);
+    setVoiceDuration(0);
+    setPreviewTexture(null);
+    setProcessing(false);
+    setError('');
+    onClose();
+  };
+
+  const startCamera = async angle => {
+    setError('');
+    stopCamera();
+    setActiveAngle(angle);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
-      if (videoRef.current) videoRef.current.srcObject = stream;
-    } catch (err) {
-      console.error('Camera access error:', err);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }
+      });
+      streamRef.current = stream;
+      setCameraActive(true);
+    } catch {
+      setError('Camera is unavailable. Choose a photo from this device instead.');
     }
   };
 
-  const capturePhoto = () => {
+  const setPhoto = (angle, blob) => {
+    if (!blob) return;
+    setPhotos(current => ({ ...current, [angle]: blob }));
+    setError('');
+  };
+
+  const capturePhoto = async () => {
     if (!videoRef.current) return;
     const canvas = document.createElement('canvas');
     canvas.width = 640;
     canvas.height = 480;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(videoRef.current, 0, 0, 640, 480);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-
-    const updated = { ...photos, [activeAngle]: dataUrl };
-    setPhotos(updated);
-
-    if (activeAngle === 'front') setActiveAngle('left');
-    else if (activeAngle === 'left') setActiveAngle('right');
+    canvas.getContext('2d').drawImage(videoRef.current, 0, 0, 640, 480);
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
+    setPhoto(activeAngle, blob);
+    stopCamera();
   };
 
   const startRecording = async () => {
-    audioChunksRef.current = [];
-    setRecordTime(0);
+    if (!voiceConsent) return;
+    setError('');
+    chunksRef.current = [];
+    setVoiceBlob(null);
+    setVoiceDuration(0);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      mediaRecorderRef.current.ondataavailable = (e) => audioChunksRef.current.push(e.data);
-      mediaRecorderRef.current.onstop = () => {
-        const blob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-        setAudioBlob(blob);
+      const recorder = new MediaRecorder(stream);
+      recorderRef.current = recorder;
+      recorder.ondataavailable = event => {
+        if (event.data.size) chunksRef.current.push(event.data);
       };
-      mediaRecorderRef.current.start();
+      recorder.onstop = () => {
+        const duration = Math.min(5, (Date.now() - recordStartedRef.current) / 1000);
+        setVoiceDuration(duration);
+        setVoiceBlob(new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' }));
+        stream.getTracks().forEach(track => track.stop());
+      };
+      recordStartedRef.current = Date.now();
+      recorder.start();
       setRecording(true);
-
-      const interval = setInterval(() => {
-        setRecordTime((prev) => {
-          if (prev >= 6) {
-            clearInterval(interval);
-            stopRecording();
-            return 6;
-          }
-          return prev + 1;
-        });
-      }, 1000);
-    } catch (err) {
-      console.error('Mic access error:', err);
+      tickTimerRef.current = setInterval(() => {
+        setVoiceDuration(Math.min(5, (Date.now() - recordStartedRef.current) / 1000));
+      }, 250);
+      stopTimerRef.current = setTimeout(stopRecording, 5000);
+    } catch {
+      setError('Microphone is unavailable. You can save without a voice sample.');
     }
   };
 
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && recording) {
-      mediaRecorderRef.current.stop();
-      setRecording(false);
+  const saveAvatar = async () => {
+    if (voiceBlob && !validateVoiceSample(voiceDuration)) {
+      setError('Record for five seconds, or remove the optional voice sample.');
+      return;
+    }
+    const validationError = validateAvatarMedia({ photos, voiceBlob });
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+    setProcessing(true);
+    setError('');
+    try {
+      const textureBlob = previewTexture || await createFaceTexture(photos.front);
+      await putAvatarMedia({ photos, textureBlob, appearance, voiceBlob });
+      await onComplete?.({ appearance });
+      closeDialog();
+    } catch (saveError) {
+      setError(saveError.message || 'Unable to save this companion.');
+      setProcessing(false);
     }
   };
 
-  const handleFinish = async () => {
-    setStep(3);
-    const payload = { photos, audioBlob };
-    if (onComplete) await onComplete(payload);
-    onClose();
-  };
+  const photoInput = angle => (
+    <label className="avatar-file-action">
+      <Upload size={20} aria-hidden="true" /> Choose {angle} photo
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        onChange={event => setPhoto(angle, event.target.files?.[0])}
+      />
+    </label>
+  );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-lg bg-emerald-900 border border-emerald-700 rounded-3xl p-6 text-white shadow-2xl">
-        <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/10" aria-label="Close">
-          <X className="w-6 h-6" />
-        </button>
+    <div className="avatar-onboarding-backdrop">
+      <section className="avatar-onboarding-dialog" role="dialog" aria-modal="true" aria-labelledby="avatar-onboarding-title">
+        <header className="avatar-onboarding-header">
+          <div>
+            <h2 id="avatar-onboarding-title">Prepare your companion</h2>
+            <p>Photos stay on this device.</p>
+          </div>
+          <button type="button" className="modal-close-btn" onClick={closeDialog} aria-label="Close avatar setup">
+            <X size={24} />
+          </button>
+        </header>
 
-        <h2 className="text-2xl font-bold text-amber-200 mb-2">Create Your 3D Companion</h2>
-        <p className="text-sm text-emerald-200 mb-6">Take 3 photos and record 5 seconds of speech to clone your avatar.</p>
+        <ol className="avatar-step-list" aria-label="Avatar setup progress">
+          {['Front photo', 'Side photos', 'Review', 'Voice option'].map((label, index) => (
+            <li key={label} className={step === index ? 'active' : step > index ? 'complete' : ''}>
+              {step > index ? <CheckCircle size={18} aria-hidden="true" /> : <span>{index + 1}</span>}
+              {label}
+            </li>
+          ))}
+        </ol>
 
-        {step === 1 && (
-          <div className="space-y-4">
-            <div className="flex justify-around gap-2 text-center text-xs">
-              {['front', 'left', 'right'].map((ang) => (
-                <button
-                  key={ang}
-                  onClick={() => setActiveAngle(ang)}
-                  className={`px-3 py-1.5 rounded-full capitalize font-semibold border ${
-                    activeAngle === ang ? 'bg-amber-400 text-emerald-950 border-amber-300' : 'bg-emerald-800/60 border-emerald-600'
-                  }`}
-                >
-                  {ang} {photos[ang] && '✓'}
-                </button>
-              ))}
-            </div>
+        <div ref={stepRef} className="avatar-onboarding-step">
+          {step === 0 && (
+            <>
+              <h3>Add a clear front photo</h3>
+              <p>Face the camera in even light. Glasses are fine.</p>
+              {photoUrls.front && <img className="avatar-photo-preview avatar-photo-preview-large" src={photoUrls.front} alt="Front photo preview" />}
+              {cameraActive && activeAngle === 'front' && <video ref={videoRef} className="avatar-camera-preview" autoPlay playsInline muted />}
+              <div className="avatar-action-row">
+                <button type="button" className="avatar-secondary-btn" onClick={() => startCamera('front')}><Camera size={20} /> Use camera</button>
+                {cameraActive && <button type="button" className="avatar-primary-btn" onClick={capturePhoto}>Take front photo</button>}
+                {photoInput('front')}
+              </div>
+              <button type="button" className="avatar-primary-btn avatar-next-btn" disabled={!photos.front} onClick={() => setStep(1)}>Continue to side photos</button>
+            </>
+          )}
 
-            <div className="relative aspect-video rounded-2xl overflow-hidden bg-black/40 border border-emerald-700">
-              <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" onLoadedMetadata={startCamera} />
-            </div>
-
-            <div className="flex gap-3">
-              <button onClick={capturePhoto} className="flex-1 py-3 bg-amber-400 text-emerald-950 font-bold rounded-2xl hover:bg-amber-300 flex items-center justify-center gap-2">
-                <Camera className="w-5 h-5" /> Snap {activeAngle} Photo
-              </button>
-              {validatePhotoSet(photos) && (
-                <button onClick={() => setStep(2)} className="px-6 py-3 bg-emerald-500 text-white font-bold rounded-2xl hover:bg-emerald-400">
-                  Next →
-                </button>
+          {step === 1 && (
+            <>
+              <h3>Add left and right photos</h3>
+              <p>Turn about 45 degrees. Keep your whole face visible.</p>
+              <div className="avatar-side-grid">
+                {['left', 'right'].map(angle => (
+                  <article key={angle} className="avatar-angle-panel">
+                    <h4>{angle === 'left' ? 'Left side' : 'Right side'}</h4>
+                    {photoUrls[angle] ? <img className="avatar-photo-preview" src={photoUrls[angle]} alt={`${angle} photo preview`} /> : <div className="avatar-photo-placeholder"><Camera size={28} /></div>}
+                    <button type="button" className="avatar-secondary-btn" onClick={() => startCamera(angle)}>Use camera</button>
+                    {photoInput(angle)}
+                  </article>
+                ))}
+              </div>
+              {cameraActive && activeAngle !== 'front' && (
+                <div className="avatar-live-capture">
+                  <video ref={videoRef} className="avatar-camera-preview" autoPlay playsInline muted />
+                  <button type="button" className="avatar-primary-btn" onClick={capturePhoto}>Take {activeAngle} photo</button>
+                </div>
               )}
-            </div>
-          </div>
-        )}
+              <div className="avatar-action-row avatar-footer-actions">
+                <button type="button" className="avatar-secondary-btn" onClick={() => setStep(0)}>Back</button>
+                <button type="button" className="avatar-primary-btn" disabled={!photos.left || !photos.right} onClick={() => { stopCamera(); setStep(2); }}>Review photos</button>
+              </div>
+            </>
+          )}
 
-        {step === 2 && (
-          <div className="space-y-6 text-center">
-            <div className="p-4 bg-emerald-800/50 rounded-2xl border border-emerald-600">
-              <p className="text-sm text-amber-100 font-medium mb-2">Please read aloud:</p>
-              <p className="text-lg italic font-serif">"The warm sun shines brightly across the green tea gardens of Assam today."</p>
-            </div>
+          {step === 2 && (
+            <>
+              <h3>Review the companion appearance</h3>
+              <p>The fixed cartoon model uses your front photo as a local texture. It does not reconstruct your face.</p>
+              <div className="avatar-review-grid">
+                {ANGLES.map(angle => <img key={angle} src={photoUrls[angle]} alt={`${angle} view`} />)}
+              </div>
+              <div className="avatar-onboarding-preview">
+                {previewTextureUrl ? (
+                  <Suspense fallback={<p>Preparing 3D preview…</p>}>
+                    <AvatarCanvas textureUrl={previewTextureUrl} />
+                  </Suspense>
+                ) : <p>Preparing 3D preview…</p>}
+              </div>
+              <div className="avatar-appearance-fields">
+                <label>Skin tone<select value={appearance.skin} onChange={event => setAppearance(current => ({ ...current, skin: event.target.value }))}><option value="light">Light</option><option value="medium">Medium</option><option value="deep">Deep</option></select></label>
+                <label>Hair tone<select value={appearance.hair} onChange={event => setAppearance(current => ({ ...current, hair: event.target.value }))}><option value="silver">Silver</option><option value="black">Black</option><option value="brown">Brown</option></select></label>
+              </div>
+              <div className="avatar-action-row avatar-footer-actions">
+                <button type="button" className="avatar-secondary-btn" onClick={() => setStep(1)}>Retake photos</button>
+                <button type="button" className="avatar-primary-btn" onClick={() => setStep(3)}>Continue to voice option</button>
+              </div>
+            </>
+          )}
 
-            <div className="flex flex-col items-center gap-3">
-              <button
-                onClick={recording ? stopRecording : startRecording}
-                className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${
-                  recording ? 'bg-red-500 animate-pulse scale-110' : 'bg-amber-400 hover:bg-amber-300 text-emerald-950'
-                }`}
-              >
-                <Mic className="w-8 h-8" />
-              </button>
-              <span className="text-sm font-semibold">{recording ? `Recording: ${recordTime}s / 5s` : audioBlob ? 'Recorded! Ready to generate' : 'Tap to record 5s'}</span>
-            </div>
+          {step === 3 && (
+            <>
+              <h3>Optional voice reference</h3>
+              <p>Voice cloning is not active. A five-second sample can be saved locally for a future caregiver-enabled feature.</p>
+              <label className="avatar-consent-row">
+                <input type="checkbox" checked={voiceConsent} onChange={event => setVoiceConsent(event.target.checked)} />
+                Save this voice sample only on this device
+              </label>
+              <div className="avatar-recording-controls">
+                <button type="button" className={recording ? 'avatar-stop-btn' : 'avatar-secondary-btn'} disabled={!voiceConsent && !recording} onClick={recording ? stopRecording : startRecording}>
+                  {recording ? <Square size={20} /> : <Mic size={20} />}
+                  {recording ? 'Stop recording' : 'Record five seconds'}
+                </button>
+                <span aria-live="polite">{recording ? `Recording ${voiceDuration.toFixed(1)} of 5 seconds` : voiceBlob ? `Saved ${voiceDuration.toFixed(1)} second sample` : 'No voice sample saved'}</span>
+                {voiceBlob && <button type="button" className="avatar-text-btn" onClick={() => { setVoiceBlob(null); setVoiceDuration(0); }}>Remove voice sample</button>}
+              </div>
+              <div className="avatar-action-row avatar-footer-actions">
+                <button type="button" className="avatar-secondary-btn" onClick={() => setStep(2)}>Back</button>
+                <button type="button" className="avatar-primary-btn" disabled={processing} onClick={saveAvatar}>{processing ? 'Preparing companion…' : 'Save companion'}</button>
+              </div>
+            </>
+          )}
+        </div>
 
-            {audioBlob && (
-              <button onClick={handleFinish} className="w-full py-3.5 bg-amber-400 text-emerald-950 font-bold rounded-2xl hover:bg-amber-300">
-                Generate 3D Avatar & Cloned Voice
-              </button>
-            )}
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="py-12 flex flex-col items-center gap-4 text-center">
-            <RefreshCw className="w-12 h-12 text-amber-400 animate-spin" />
-            <h3 className="text-xl font-bold text-amber-200">Building 3D Mesh & Training Voice...</h3>
-            <p className="text-xs text-emerald-200">Extracting 52 ARKit blendshapes & speaker embedding.</p>
-          </div>
-        )}
-      </div>
+        {error && <p className="avatar-error" role="alert">{error}</p>}
+      </section>
     </div>
   );
 }

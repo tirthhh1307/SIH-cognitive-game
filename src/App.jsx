@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { CategoryCard } from './components/CategoryCard';
 import { BottomBanner } from './components/BottomBanner';
@@ -22,11 +22,13 @@ import { GameLibrary } from './components/GameLibrary';
 import { GameRunner } from './components/games/GameRunner';
 import { DailyCheckIn } from './components/DailyCheckIn';
 import { MemoryAnchors } from './components/MemoryAnchors';
-import { clearAnchors, listAnchors } from './utils/mediaStore';
+import { clearAnchors, clearAvatarMedia, listAnchors } from './utils/mediaStore';
 import { CaregiverDashboard } from './components/CaregiverDashboard';
 import { ProfileModal } from './components/ProfileModal';
 import { getGame } from './data/games';
 import { t, LANGUAGES } from './data/i18n';
+
+const AvatarOnboardingModal = lazy(() => import('./components/avatar/AvatarOnboardingModal'));
 
 export default function App() {
   const [platformState, setPlatformState] = useState(() => loadPlatformState(localStorage));
@@ -34,6 +36,7 @@ export default function App() {
   const [activeModal, setActiveModal] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showAvatarOnboarding, setShowAvatarOnboarding] = useState(false);
   const [starNotification, setStarNotification] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
   const [togetherMode, setTogetherMode] = useState(false);
@@ -74,6 +77,7 @@ export default function App() {
       if (event.key !== 'Escape') return;
       setActiveModal(null);
       setShowSettings(false);
+      setShowAvatarOnboarding(false);
       setSelectedGame(null);
     };
     window.addEventListener('keydown', closeOnEscape);
@@ -119,6 +123,7 @@ export default function App() {
   const handleDeleteAll = async () => {
     clearPlatformData(localStorage);
     try { await clearAnchors(); } catch {}
+    try { await clearAvatarMedia(); } catch {}
     setAnchors([]);
     setSelectedGame(null);
     setActiveView('home');
@@ -369,7 +374,24 @@ export default function App() {
           currentAvatar={avatar}
           setAvatar={(newAvatar) => setPlatformState(prev => ({ ...prev, profile: { ...prev.profile, avatar: newAvatar } }))}
           language={language}
+          onCreateAvatar={() => {
+            setShowProfileModal(false);
+            setShowAvatarOnboarding(true);
+          }}
         />
+      )}
+
+      {showAvatarOnboarding && (
+        <Suspense fallback={null}>
+          <AvatarOnboardingModal
+            isOpen
+            onClose={() => setShowAvatarOnboarding(false)}
+            onComplete={({ appearance }) => setPlatformState(prev => ({
+              ...prev,
+              profile: { ...prev.profile, avatar3d: { enabled: true, appearance } }
+            }))}
+          />
+        </Suspense>
       )}
 
       {showSettings && (
