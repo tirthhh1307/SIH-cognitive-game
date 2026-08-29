@@ -25,7 +25,8 @@ export function createInitialState() {
       scenicAutoSlide: true
     },
     difficultyByGame: {},
-    reportsExported: 0
+    reportsExported: 0,
+    journalEntries: []
   };
 }
 
@@ -46,7 +47,8 @@ export function loadPlatformState(storage = globalThis.localStorage) {
       difficultyByGame: saved.difficultyByGame && typeof saved.difficultyByGame === 'object' ? saved.difficultyByGame : {},
       attempts: Array.isArray(saved.attempts) ? saved.attempts : [],
       checkIns: Array.isArray(saved.checkIns) ? saved.checkIns : [],
-      reminders: Array.isArray(saved.reminders) ? saved.reminders : []
+      reminders: Array.isArray(saved.reminders) ? saved.reminders : [],
+      journalEntries: Array.isArray(saved.journalEntries) ? saved.journalEntries : []
     };
   } catch {
     return createInitialState();
@@ -184,3 +186,17 @@ export function setBaselineFromAttempts(state, gameIds) {
     }
   };
 }
+
+export function addJournalEntry(state, entry) {
+  if (!entry?.id || !entry.text?.trim()) return state;
+  const normalized = {
+    ...entry,
+    text: entry.text.trim(),
+    createdAt: entry.createdAt || new Date().toISOString()
+  };
+  return {
+    ...state,
+    journalEntries: [normalized, ...(state.journalEntries || [])].slice(0, 100)
+  };
+}
+

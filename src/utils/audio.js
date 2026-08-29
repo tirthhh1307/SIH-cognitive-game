@@ -253,6 +253,162 @@ export function startNatureAmbience() {
   }
 }
 
+export function playPepaHorn(frequency = 587.33) {
+  if (isMuted) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const osc = ctx.createOscillator();
+  const osc2 = ctx.createOscillator();
+  const filter = ctx.createBiquadFilter();
+  const gain = ctx.createGain();
+
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+  // Gentle pitch bend typical of hornpipe
+  osc.frequency.linearRampToValueAtTime(frequency * 1.03, ctx.currentTime + 0.1);
+  osc.frequency.exponentialRampToValueAtTime(frequency, ctx.currentTime + 0.35);
+
+  osc2.type = 'square';
+  osc2.frequency.setValueAtTime(frequency * 2, ctx.currentTime);
+
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(1400, ctx.currentTime);
+  filter.Q.value = 3;
+
+  gain.gain.setValueAtTime(0, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(soundVolume * 0.45, ctx.currentTime + 0.04);
+  gain.gain.exponentialRampToValueAtTime(soundVolume * 0.25, ctx.currentTime + 0.25);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+
+  osc.connect(filter);
+  osc2.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start();
+  osc2.start();
+  osc.stop(ctx.currentTime + 0.65);
+  osc2.stop(ctx.currentTime + 0.65);
+}
+
+export function playTokariPluck(frequency = 392) {
+  if (isMuted) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const osc = ctx.createOscillator();
+  const oscHarmonic = ctx.createOscillator();
+  const gain = ctx.createGain();
+  const gainHarmonic = ctx.createGain();
+
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+
+  oscHarmonic.type = 'sine';
+  oscHarmonic.frequency.setValueAtTime(frequency * 2.01, ctx.currentTime);
+
+  gain.gain.setValueAtTime(soundVolume * 0.6, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(soundVolume * 0.1, ctx.currentTime + 0.15);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.75);
+
+  gainHarmonic.gain.setValueAtTime(soundVolume * 0.3, ctx.currentTime);
+  gainHarmonic.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
+
+  osc.connect(gain);
+  oscHarmonic.connect(gainHarmonic);
+  gain.connect(ctx.destination);
+  gainHarmonic.connect(ctx.destination);
+
+  osc.start();
+  oscHarmonic.start();
+  osc.stop(ctx.currentTime + 0.8);
+  oscHarmonic.stop(ctx.currentTime + 0.35);
+}
+
+export function playGaganaReed(frequency = 440) {
+  if (isMuted) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const osc = ctx.createOscillator();
+  const filter = ctx.createBiquadFilter();
+  const gain = ctx.createGain();
+
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+  // Twang pitch glide
+  osc.frequency.exponentialRampToValueAtTime(frequency * 1.15, ctx.currentTime + 0.08);
+  osc.frequency.exponentialRampToValueAtTime(frequency, ctx.currentTime + 0.25);
+
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(850, ctx.currentTime);
+  filter.frequency.linearRampToValueAtTime(1600, ctx.currentTime + 0.1);
+  filter.frequency.linearRampToValueAtTime(600, ctx.currentTime + 0.35);
+  filter.Q.value = 5;
+
+  gain.gain.setValueAtTime(soundVolume * 0.5, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start();
+  osc.stop(ctx.currentTime + 0.5);
+}
+
+export function playTaalCymbal() {
+  if (isMuted) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const frequencies = [840, 1120, 1680, 2240, 3150];
+  frequencies.forEach((freq, idx) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq + (Math.random() * 20 - 10), ctx.currentTime);
+
+    const initialGain = soundVolume * (0.2 / (idx + 1));
+    gain.gain.setValueAtTime(initialGain, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.2);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 1.25);
+  });
+}
+
+export function playFluteTone(frequency = 659.25) {
+  if (isMuted) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+  // Slight warm vibrato
+  osc.frequency.linearRampToValueAtTime(frequency * 1.008, ctx.currentTime + 0.2);
+  osc.frequency.linearRampToValueAtTime(frequency * 0.995, ctx.currentTime + 0.4);
+
+  gain.gain.setValueAtTime(0, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(soundVolume * 0.4, ctx.currentTime + 0.08);
+  gain.gain.exponentialRampToValueAtTime(soundVolume * 0.25, ctx.currentTime + 0.45);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.85);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start();
+  osc.stop(ctx.currentTime + 0.9);
+}
+
 export function stopNatureAmbience() {
   if (streamSource) {
     try {
@@ -263,3 +419,4 @@ export function stopNatureAmbience() {
   }
   isNaturePlaying = false;
 }
+
