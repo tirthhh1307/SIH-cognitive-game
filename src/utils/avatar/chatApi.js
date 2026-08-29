@@ -1,14 +1,14 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const API_KEY = 'AIzaSyB6fgftlMeU2t7tAOtUqFViULA0Z0k6nLw';
-const MODEL = 'gemini-3.5-flash-lite';
+const API_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) ||
+  (typeof process !== 'undefined' && process.env?.VITE_GEMINI_API_KEY) ||
+  '';
+const MODEL = 'gemini-2.5-flash-lite';
 
 const SYSTEM_INSTRUCTION =
   'You are Apon Mon, a calm companion for an older adult. Reply in short, ' +
   'clear sentences. Never diagnose dementia or replace medical care. ' +
   'For medical decisions, ask the person to involve a caregiver or qualified clinician.';
-
-const genAI = new GoogleGenerativeAI(API_KEY);
 
 export function trimHistory(history) {
   return (Array.isArray(history) ? history : [])
@@ -22,11 +22,48 @@ export function trimHistory(history) {
     .slice(-8);
 }
 
-export async function sendChat(payload, { signal } = {}) {
+export function buildChatForm({ text, audio, history, profileId = 'local' }) {
+  const form = new FormData();
+  if (audio) form.append('audio', audio, `voice.${audio.type?.includes('ogg') ? 'ogg' : 'webm'}`);
+  else form.append('text', String(text || '').trim());
+  form.append('history', JSON.stringify(trimHistory(history)));
+  form.append('profile_id', profileId);
+  return form;
+}
+
+export async function sendChat(payload, { signal, fetchImpl } = {}) {
   const { text, history = [] } = payload;
   const inputText = (text || '').trim();
-  if (!inputText) throw new Error('Please type a message.');
+  if (!inputText && !payload.audio) throw new Error('Please type a message.');
 
+  // If fetchImpl is provided (e.g. In tests or custom proxy), use standard API endpoint
+  if (fetchImpl) {
+    const response = await fetchImpl('/api/chat/interact', {
+      method: 'POST',
+      body: buildChatForm(payload),
+      signal
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.detail || 'Unable to reach the companion.');
+    return data;
+  }
+
+  // Fallback to fetch backend if API key is not configured
+  if (!API_KEY) {
+    try {
+      const response = await fetch('/api/chat/interact', {
+        method: 'POST',
+        body: buildChatForm(payload),
+        signal
+      });
+      const data = await response.json().catch(() => ({}));
+      if (response.ok && data?.text) return data;
+    } catch {
+      // Backend not running, fall through
+    }
+  }
+
+  const genAI = new GoogleGenerativeAI(API_KEY);
   const model = genAI.getGenerativeModel({
     model: MODEL,
     systemInstruction: SYSTEM_INSTRUCTION,
@@ -43,7 +80,6 @@ export async function sendChat(payload, { signal } = {}) {
 
   const chat = model.startChat({ history: contents });
 
-  // Support AbortController
   const resultPromise = chat.sendMessage(inputText);
   if (signal) {
     const abortPromise = new Promise((_, reject) => {
