@@ -56,7 +56,8 @@ export default function AvatarCanvas({
     let disposed = false;
     let blinkStartedAt = 0;
     let nextBlinkAt = 2.8;
-    const clock = new THREE.Clock();
+    const timer = new THREE.Timer();
+    timer.connect(document);
 
     const applyTexture = model => {
       if (!textureUrl) return;
@@ -110,8 +111,9 @@ export default function AvatarCanvas({
         return;
       }
       frameId = requestAnimationFrame(animate);
-      const delta = clock.getDelta();
-      const elapsed = clock.getElapsedTime();
+      timer.update();
+      const delta = timer.getDelta();
+      const elapsed = timer.getElapsed();
 
       if (currentModel && !reducedMotion) {
         currentModel.position.y = Math.sin(elapsed * 1.4) * 0.006;
@@ -157,7 +159,7 @@ export default function AvatarCanvas({
     };
     const resume = () => {
       if (!document.hidden && !frameId) {
-        clock.getDelta();
+        timer.update();
         animate();
       }
     };
@@ -167,6 +169,7 @@ export default function AvatarCanvas({
     return () => {
       disposed = true;
       if (frameId) cancelAnimationFrame(frameId);
+      timer.dispose();
       window.removeEventListener('resize', resize);
       document.removeEventListener('visibilitychange', resume);
       customTexture?.dispose();

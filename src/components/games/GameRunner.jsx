@@ -21,19 +21,26 @@ const labelsFor = options => options.map((entry, index) => typeof entry === 'str
   ? { id: index, label: entry, symbol: '' }
   : entry);
 
+// Reuse shared AudioContext from audio.js instead of creating a new one per call
+let _synthCtx = null;
 function playSynthTone(frequency = 440, duration = 0.4) {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    if (!_synthCtx) {
+      const Ctor = window.AudioContext || window.webkitAudioContext;
+      if (!Ctor) { playXylophoneNote(frequency); return; }
+      _synthCtx = new Ctor();
+    }
+    if (_synthCtx.state === 'suspended') _synthCtx.resume().catch(() => {});
+    const osc = _synthCtx.createOscillator();
+    const gain = _synthCtx.createGain();
     osc.type = 'sine';
     osc.frequency.value = frequency;
-    gain.gain.setValueAtTime(0.2, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    gain.gain.setValueAtTime(0.2, _synthCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, _synthCtx.currentTime + duration);
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(_synthCtx.destination);
     osc.start();
-    osc.stop(ctx.currentTime + duration);
+    osc.stop(_synthCtx.currentTime + duration);
   } catch {
     playXylophoneNote(frequency);
   }

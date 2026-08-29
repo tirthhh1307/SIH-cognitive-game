@@ -1,4 +1,5 @@
 // Web Audio API Sound Synthesizer for SIH Cognitive Game
+// AudioContext deferred until first user gesture to avoid browser autoplay warnings
 let audioCtx = null;
 
 function getAudioContext() {
@@ -9,7 +10,7 @@ function getAudioContext() {
     }
   }
   if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume();
+    audioCtx.resume().catch(() => {});
   }
   return audioCtx;
 }
