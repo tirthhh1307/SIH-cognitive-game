@@ -1,3 +1,15 @@
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+const API_KEY = 'AIzaSyB6fgftlMeU2t7tAOtUqFViULA0Z0k6nLw';
+const MODEL = 'gemini-3.5-flash-lite';
+
+const SYSTEM_INSTRUCTION =
+  'You are Apon Mon, a calm companion for an older adult. Reply in short, ' +
+  'clear sentences. Never diagnose dementia or replace medical care. ' +
+  'For medical decisions, ask the person to involve a caregiver or qualified clinician.';
+
+const genAI = new GoogleGenerativeAI(API_KEY);
+
 export function trimHistory(history) {
   return (Array.isArray(history) ? history : [])
     .filter(item =>
@@ -10,22 +22,41 @@ export function trimHistory(history) {
     .slice(-8);
 }
 
-export function buildChatForm({ text, audio, history, profileId = 'local' }) {
-  const form = new FormData();
-  if (audio) form.append('audio', audio, `voice.${audio.type?.includes('ogg') ? 'ogg' : 'webm'}`);
-  else form.append('text', String(text || '').trim());
-  form.append('history', JSON.stringify(trimHistory(history)));
-  form.append('profile_id', profileId);
-  return form;
-}
+export async function sendChat(payload, { signal } = {}) {
+  const { text, history = [] } = payload;
+  const inputText = (text || '').trim();
+  if (!inputText) throw new Error('Please type a message.');
 
-export async function sendChat(payload, { signal, fetchImpl = fetch } = {}) {
-  const response = await fetchImpl('/api/chat/interact', {
-    method: 'POST',
-    body: buildChatForm(payload),
-    signal
+  const model = genAI.getGenerativeModel({
+    model: MODEL,
+    systemInstruction: SYSTEM_INSTRUCTION,
+    generationConfig: {
+      temperature: 0.4,
+      maxOutputTokens: 180,
+    },
   });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.detail || 'Unable to reach the companion.');
-  return data;
+
+  const contents = trimHistory(history).map(item => ({
+    role: item.role,
+    parts: [{ text: item.text }],
+  }));
+
+  const chat = model.startChat({ history: contents });
+
+  // Support AbortController
+  const resultPromise = chat.sendMessage(inputText);
+  if (signal) {
+    const abortPromise = new Promise((_, reject) => {
+      signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')), { once: true });
+    });
+    const result = await Promise.race([resultPromise, abortPromise]);
+    const reply = (result.response.text() || '').trim();
+    if (!reply) throw new Error('Companion returned an empty response.');
+    return { inputText, text: reply };
+  }
+
+  const result = await resultPromise;
+  const reply = (result.response.text() || '').trim();
+  if (!reply) throw new Error('Companion returned an empty response.');
+  return { inputText, text: reply };
 }

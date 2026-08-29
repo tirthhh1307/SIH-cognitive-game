@@ -97,8 +97,48 @@ export default function AvatarCanvas({
           if (child.isMesh && child.morphTargetDictionary && child.morphTargetInfluences) {
             morphMeshes.push(child);
           }
+          if (child.isMesh) {
+            const name = (child.name || '').toLowerCase();
+            const materials = Array.isArray(child.material) ? child.material : [child.material];
+            materials.filter(Boolean).forEach(mat => {
+              // T-shirt / body clothing → black
+              if (name.includes('body') || name.includes('cloth') || name.includes('shirt') || name.includes('top') || name.includes('outfit')) {
+                mat.color = new THREE.Color(0x111111);
+                mat.needsUpdate = true;
+              }
+              // Skin / face → slightly darker
+              if (name.includes('face') || name.includes('skin') || name.includes('head')) {
+                const c = mat.color || new THREE.Color(1, 1, 1);
+                mat.color = new THREE.Color(c.r * 0.78, c.g * 0.72, c.b * 0.65);
+                mat.needsUpdate = true;
+              }
+            });
+          }
         });
         if (!morphMeshes.length) unavailableRef.current?.();
+
+        // Rotate arms from T-pose to natural arms-down rest pose
+        const armBoneMap = {
+          leftUpper:  ['J_Bip_L_UpperArm', 'leftUpperArm', 'mixamorig:LeftArm', 'LeftArm', 'Left arm', 'Arm_L'],
+          rightUpper: ['J_Bip_R_UpperArm', 'rightUpperArm', 'mixamorig:RightArm', 'RightArm', 'Right arm', 'Arm_R'],
+          leftLower:  ['J_Bip_L_LowerArm', 'leftLowerArm', 'mixamorig:LeftForeArm', 'LeftForeArm', 'Left elbow', 'Elbow_L'],
+          rightLower: ['J_Bip_R_LowerArm', 'rightLowerArm', 'mixamorig:RightForeArm', 'RightForeArm', 'Right elbow', 'Elbow_R'],
+        };
+        const findBone = (root, names) => {
+          let found = null;
+          root.traverse(node => { if (!found && node.isBone && names.includes(node.name)) found = node; });
+          return found;
+        };
+        const deg = Math.PI / 180;
+        const leftUpper = findBone(currentModel, armBoneMap.leftUpper);
+        const rightUpper = findBone(currentModel, armBoneMap.rightUpper);
+        const leftLower = findBone(currentModel, armBoneMap.leftLower);
+        const rightLower = findBone(currentModel, armBoneMap.rightLower);
+        if (leftUpper)  leftUpper.rotation.z += 70 * deg;
+        if (rightUpper) rightUpper.rotation.z -= 70 * deg;
+        if (leftLower)  leftLower.rotation.z += 5 * deg;
+        if (rightLower) rightLower.rotation.z -= 5 * deg;
+
         applyTexture(currentModel);
       },
       undefined,

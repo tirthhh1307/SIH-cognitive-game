@@ -10,6 +10,7 @@
     "test": "node --test tests/gameCatalog.test.js tests/gameEngine.test.js tests/i18n.test.js tests/mediaStore.test.js tests/platform.test.js tests/pwa.test.js tests/shell.test.js tests/visemeMapper.test.js tests/audioSyncEngine.test.js tests/avatarOnboarding.test.js tests/avatarChat.test.js tests/avatarCopy.test.js tests/speechVisemes.test.js tests/fullPipeline.test.js"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "animejs": "^4.5.0",
     "canvas-confetti": "^1.9.4",
     "lucide-react": "^1.16.0",

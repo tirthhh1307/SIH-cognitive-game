@@ -1,7 +1,7 @@
 import os
 
 
-MODEL = "gemini-3.1-flash-lite"
+MODEL = "gemini-3.5-flash-lite"
 SYSTEM_INSTRUCTION = (
     "You are Apon Mon, a calm companion for an older adult. Reply in short, "
     "clear sentences. Never diagnose dementia or replace medical care. "
