@@ -14,7 +14,7 @@ import { MemoryGardenModal } from './components/games/MemoryGardenModal';
 import { MemoryGardenView } from './components/garden/MemoryGardenView';
 import { MusicJoyModal } from './components/games/MusicJoyModal';
 import { StoriesMemoriesModal } from './components/games/StoriesMemoriesModal';
-import { toggleMute, playStarSound } from './utils/audio';
+import { toggleMute, playStarSound, playClickSound, playHoverSound } from './utils/audio';
 import { speakText } from './utils/speech';
 import { AppNav } from './components/AppNav';
 import { ConsentGate } from './components/ConsentGate';
@@ -335,13 +335,30 @@ export default function App() {
 
         {activeView === 'home' ? (
           <main className="categories-grid-section">
-            <button type="button" className="avatar-companion-entry" onClick={() => setActiveView('companion')}>
-              <img src={avatar} alt="" />
-              <span>
-                <strong>{t(language, 'companion.entry')}</strong>
-                <small>{t(language, 'companion.entrySub')}</small>
-              </span>
-              <span aria-hidden="true">→</span>
+            <button
+              type="button"
+              className="avatar-companion-entry"
+              onClick={() => {
+                playClickSound();
+                setActiveView('companion');
+              }}
+              onMouseEnter={playHoverSound}
+              aria-label={`${t(language, 'companion.entry')}: ${t(language, 'companion.entrySub')}`}
+            >
+              <div className="companion-entry-left">
+                <div className="companion-avatar-wrapper">
+                  <img src={avatar} alt="Companion" />
+                  <span className="companion-status-dot" aria-hidden="true" />
+                </div>
+                <div className="companion-entry-text">
+                  <strong>{t(language, 'companion.entry')}</strong>
+                  <small>{t(language, 'companion.entrySub')}</small>
+                </div>
+              </div>
+              <div className="companion-entry-action">
+                <span>{language === 'as' ? 'কথা পাতক' : language === 'hi' ? 'बातचीत करें' : 'Talk with Companion'}</span>
+                <span className="companion-arrow" aria-hidden="true">→</span>
+              </div>
             </button>
             <div className="categories-grid">
               {categoryCards.map((card) => (

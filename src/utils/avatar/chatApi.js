@@ -83,8 +83,8 @@ export async function sendChat(payload, { signal, fetchImpl } = {}) {
     });
     const data = await response.json().catch(() => ({}));
     if (response.ok && data?.text) return data;
-  } catch {
-    // Backend not running, proceed to direct client SDK or offline fallback
+  } catch (fetchErr) {
+    if (fetchErr.name === 'AbortError') throw fetchErr;
   }
 
   // 3. If API Key is present, call Google Generative AI
@@ -121,8 +121,8 @@ export async function sendChat(payload, { signal, fetchImpl } = {}) {
         if (reply) return { inputText, text: reply };
       }
     } catch (apiError) {
+      if (apiError.name === 'AbortError') throw apiError;
       console.warn('Gemini API call failed, using offline companion fallback:', apiError);
-      // Fall through to offline response
     }
   }
 

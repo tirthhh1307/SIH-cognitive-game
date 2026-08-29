@@ -59,6 +59,87 @@ export default function AvatarCanvas({
     const timer = new THREE.Timer();
     timer.connect(document);
 
+    function createAssamiFaceTexture(baseTexture) {
+      if (!baseTexture?.image) return baseTexture;
+      try {
+        const canvas = document.createElement('canvas');
+        const img = baseTexture.image;
+        canvas.width = img.width || 1024;
+        canvas.height = img.height || 1024;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const w = canvas.width;
+        const h = canvas.height;
+
+        // 1. Traditional Assamese red bindi (Phut) on the forehead
+        const bx = w * 0.5;
+        const by = h * 0.487;
+        const bRadius = w * 0.011;
+
+        ctx.beginPath();
+        ctx.arc(bx, by, bRadius, 0, Math.PI * 2);
+        ctx.fillStyle = '#b71c1c';
+        ctx.fill();
+        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = '#6d0707';
+        ctx.stroke();
+
+        // 2. Clear, delicate nose definition
+        const nx = w * 0.5;
+        const ny = h * 0.662;
+
+        // Subtle soft shadow notch
+        ctx.beginPath();
+        ctx.ellipse(nx + w * 0.001, ny, w * 0.0035, h * 0.006, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(105, 48, 25, 0.65)';
+        ctx.fill();
+
+        // Delicate warm contour stroke
+        ctx.beginPath();
+        ctx.moveTo(nx, ny - h * 0.005);
+        ctx.lineTo(nx, ny + h * 0.004);
+        ctx.strokeStyle = 'rgba(75, 32, 16, 0.85)';
+        ctx.lineWidth = Math.max(2, w * 0.0025);
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // 3. Clear, natural warm rose lip definition
+        const mx = w * 0.5;
+        const my = h * 0.755;
+        const lipHalfW = w * 0.038;
+
+        // Soft natural rose lip tint (upper + lower)
+        ctx.beginPath();
+        ctx.ellipse(mx, my, lipHalfW * 0.95, h * 0.012, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(185, 75, 80, 0.55)';
+        ctx.fill();
+
+        // Clean, defined lip parting smile line
+        ctx.beginPath();
+        ctx.moveTo(mx - lipHalfW, my);
+        ctx.quadraticCurveTo(mx - lipHalfW * 0.5, my + h * 0.0025, mx, my + h * 0.001);
+        ctx.quadraticCurveTo(mx + lipHalfW * 0.5, my + h * 0.0025, mx + lipHalfW, my);
+        ctx.strokeStyle = '#6e2327';
+        ctx.lineWidth = Math.max(2.5, w * 0.003);
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // Subtle bottom lip soft shadow
+        ctx.beginPath();
+        ctx.ellipse(mx, my + h * 0.012, lipHalfW * 0.45, h * 0.0035, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(95, 42, 25, 0.5)';
+        ctx.fill();
+
+        const canvasTexture = new THREE.CanvasTexture(canvas);
+        canvasTexture.flipY = false;
+        canvasTexture.colorSpace = THREE.SRGBColorSpace;
+        return canvasTexture;
+      } catch {
+        return baseTexture;
+      }
+    }
+
     const applyTexture = model => {
       if (!textureUrl) return;
       new THREE.TextureLoader().load(textureUrl, texture => {
@@ -73,8 +154,10 @@ export default function AvatarCanvas({
           if (!child.isMesh || !child.name.toLowerCase().includes('face')) return;
           const materials = Array.isArray(child.material) ? child.material : [child.material];
           materials.filter(Boolean).forEach(material => {
-            material.map = texture;
-            material.needsUpdate = true;
+            if (material.name?.includes('SKIN') || material.name?.includes('Face_00')) {
+              material.map = texture;
+              material.needsUpdate = true;
+            }
           });
         });
       });
@@ -102,15 +185,38 @@ export default function AvatarCanvas({
             materials.filter(Boolean).forEach(mat => {
               const matName = mat.name || '';
 
-              // Black T-Shirt
-              if (matName.includes('Tops') || matName.includes('CLOTH') && !matName.includes('Bottoms') && !matName.includes('Shoes')) {
-                mat.color = new THREE.Color(0x181818);
+              // Yellow / Ochre T-Shirt (traditional warm golden ochre)
+              if (matName.includes('Tops') || (matName.includes('CLOTH') && !matName.includes('Bottoms') && !matName.includes('Shoes'))) {
+                mat.color = new THREE.Color(0xd99e28);
                 mat.needsUpdate = true;
               }
-              // Tan Skin for Body and Face
+              // Assamese rich warm golden-tan skin tone for body and face
               else if (matName.includes('SKIN') || matName.includes('Body') || matName.includes('Face_00')) {
-                // Tint texture to warm tan skin tone
-                mat.color = new THREE.Color(0.86, 0.72, 0.62);
+                mat.color = new THREE.Color(0.70, 0.48, 0.35);
+                if (matName.includes('Face_00') && !textureUrl && mat.map) {
+                  const assamiMap = createAssamiFaceTexture(mat.map);
+                  mat.map = assamiMap;
+                }
+                mat.needsUpdate = true;
+              }
+              // Natural lustrous black hair with subtle warm sheen
+              else if (matName.includes('HAIR') || matName.includes('Hair')) {
+                mat.color = new THREE.Color(0.12, 0.10, 0.09);
+                mat.needsUpdate = true;
+              }
+              // Deep warm dark eyes
+              else if (matName.includes('EyeIris')) {
+                mat.color = new THREE.Color(0.20, 0.13, 0.08);
+                mat.needsUpdate = true;
+              }
+              // Dark defined brows and eyeline
+              else if (matName.includes('FaceBrow') || matName.includes('FaceEyeline')) {
+                mat.color = new THREE.Color(0.10, 0.08, 0.08);
+                mat.needsUpdate = true;
+              }
+              // Healthy natural mouth interior
+              else if (matName.includes('FaceMouth')) {
+                mat.color = new THREE.Color('#d46267');
                 mat.needsUpdate = true;
               }
             });
@@ -118,7 +224,7 @@ export default function AvatarCanvas({
         });
         if (!morphMeshes.length) unavailableRef.current?.();
 
-        // Rotate arms & sleeves down from T-pose to natural resting pose
+        // Rotate arms & sleeves down cleanly from T-pose to natural resting pose
         const deg = Math.PI / 180;
         const findNode = name => {
           let target = null;
@@ -128,40 +234,66 @@ export default function AvatarCanvas({
           return target;
         };
 
-        // Left arm & sleeve (Z negative rotates down)
+        // Left shoulder, arm, sleeve & aim bones (Z negative rotates down)
+        const leftShoulder = findNode('J_Bip_L_Shoulder');
         const leftUpper = findNode('J_Bip_L_UpperArm');
         const leftSleeve = findNode('J_Aim_L_TopsUpperArm');
+        const leftAimShoulder = findNode('J_Aim_L_Shoulder');
+        const leftRollArm = findNode('J_Roll_L_UpperArm');
         const leftLower = findNode('J_Bip_L_LowerArm');
-        if (leftUpper) {
-          leftUpper.rotation.z -= 70 * deg;
-          leftUpper.rotation.y += 10 * deg;
-          leftUpper.rotation.x += 5 * deg;
+
+        if (leftShoulder) {
+          leftShoulder.rotation.z -= 4 * deg;
         }
-        if (leftSleeve) {
-          leftSleeve.rotation.z -= 70 * deg;
-          leftSleeve.rotation.y += 10 * deg;
+
+        const lUpperRotZ = -62 * deg;
+        const lUpperRotY = 10 * deg;
+        const lUpperRotX = 4 * deg;
+
+        [leftUpper, leftSleeve, leftAimShoulder].forEach(node => {
+          if (node) {
+            node.rotation.z += lUpperRotZ;
+            node.rotation.y += lUpperRotY;
+            node.rotation.x += lUpperRotX;
+          }
+        });
+        if (leftRollArm) {
+          leftRollArm.rotation.set(0, 0, 0);
         }
         if (leftLower) {
           leftLower.rotation.z -= 10 * deg;
-          leftLower.rotation.y += 15 * deg;
+          leftLower.rotation.y += 12 * deg;
         }
 
-        // Right arm & sleeve (Z positive rotates down)
+        // Right shoulder, arm, sleeve & aim bones (Z positive rotates down)
+        const rightShoulder = findNode('J_Bip_R_Shoulder');
         const rightUpper = findNode('J_Bip_R_UpperArm');
         const rightSleeve = findNode('J_Aim_R_TopsUpperArm');
+        const rightAimShoulder = findNode('J_Aim_R_Shoulder');
+        const rightRollArm = findNode('J_Roll_R_UpperArm');
         const rightLower = findNode('J_Bip_R_LowerArm');
-        if (rightUpper) {
-          rightUpper.rotation.z += 70 * deg;
-          rightUpper.rotation.y -= 10 * deg;
-          rightUpper.rotation.x += 5 * deg;
+
+        if (rightShoulder) {
+          rightShoulder.rotation.z += 4 * deg;
         }
-        if (rightSleeve) {
-          rightSleeve.rotation.z += 70 * deg;
-          rightSleeve.rotation.y -= 10 * deg;
+
+        const rUpperRotZ = 62 * deg;
+        const rUpperRotY = -10 * deg;
+        const rUpperRotX = 4 * deg;
+
+        [rightUpper, rightSleeve, rightAimShoulder].forEach(node => {
+          if (node) {
+            node.rotation.z += rUpperRotZ;
+            node.rotation.y += rUpperRotY;
+            node.rotation.x += rUpperRotX;
+          }
+        });
+        if (rightRollArm) {
+          rightRollArm.rotation.set(0, 0, 0);
         }
         if (rightLower) {
           rightLower.rotation.z += 10 * deg;
-          rightLower.rotation.y -= 15 * deg;
+          rightLower.rotation.y -= 12 * deg;
         }
 
         applyTexture(currentModel);

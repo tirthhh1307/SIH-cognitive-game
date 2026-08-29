@@ -12,7 +12,7 @@ export default function AvatarOnboardingModal({ isOpen, onClose, onComplete }) {
   const [step, setStep] = useState(0);
   const [photos, setPhotos] = useState({ front: null, left: null, right: null });
   const [activeAngle, setActiveAngle] = useState('front');
-  const [appearance, setAppearance] = useState({ skin: 'medium', hair: 'silver' });
+  const [appearance, setAppearance] = useState({ skin: 'medium', hair: 'black' });
   const [voiceConsent, setVoiceConsent] = useState(false);
   const [voiceBlob, setVoiceBlob] = useState(null);
   const [voiceDuration, setVoiceDuration] = useState(0);
