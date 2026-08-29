@@ -29,6 +29,7 @@ export default function AvatarOnboardingModal({ isOpen, onClose, onComplete }) {
   const recordStartedRef = useRef(0);
   const stopTimerRef = useRef();
   const tickTimerRef = useRef();
+  const voiceConsentRef = useRef(false);
 
   const photoUrls = useMemo(() => Object.fromEntries(
     ANGLES.map(angle => [angle, photos[angle] ? URL.createObjectURL(photos[angle]) : ''])
@@ -53,6 +54,7 @@ export default function AvatarOnboardingModal({ isOpen, onClose, onComplete }) {
   };
 
   useEffect(() => () => {
+    voiceConsentRef.current = false;
     stopCamera();
     stopRecording();
   }, []);
@@ -85,6 +87,7 @@ export default function AvatarOnboardingModal({ isOpen, onClose, onComplete }) {
   if (!isOpen) return null;
 
   const closeDialog = () => {
+    voiceConsentRef.current = false;
     stopCamera();
     stopRecording();
     setStep(0);
@@ -145,9 +148,10 @@ export default function AvatarOnboardingModal({ isOpen, onClose, onComplete }) {
       };
       recorder.onstop = () => {
         const duration = Math.min(5, (Date.now() - recordStartedRef.current) / 1000);
+        stream.getTracks().forEach(track => track.stop());
+        if (!voiceConsentRef.current) return;
         setVoiceDuration(duration);
         setVoiceBlob(new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' }));
-        stream.getTracks().forEach(track => track.stop());
       };
       recordStartedRef.current = Date.now();
       recorder.start();
@@ -162,11 +166,12 @@ export default function AvatarOnboardingModal({ isOpen, onClose, onComplete }) {
   };
 
   const saveAvatar = async () => {
-    if (voiceBlob && !validateVoiceSample(voiceDuration)) {
+    const savedVoice = voiceConsent ? voiceBlob : null;
+    if (savedVoice && !validateVoiceSample(voiceDuration)) {
       setError('Record for five seconds, or remove the optional voice sample.');
       return;
     }
-    const validationError = validateAvatarMedia({ photos, voiceBlob });
+    const validationError = validateAvatarMedia({ photos, voiceBlob: savedVoice });
     if (validationError) {
       setError(validationError);
       return;
@@ -175,7 +180,7 @@ export default function AvatarOnboardingModal({ isOpen, onClose, onComplete }) {
     setError('');
     try {
       const textureBlob = previewTexture || await createFaceTexture(photos.front);
-      await putAvatarMedia({ photos, textureBlob, appearance, voiceBlob });
+      await putAvatarMedia({ photos, textureBlob, appearance, voiceBlob: savedVoice });
       await onComplete?.({ appearance });
       closeDialog();
     } catch (saveError) {
@@ -194,6 +199,16 @@ export default function AvatarOnboardingModal({ isOpen, onClose, onComplete }) {
       />
     </label>
   );
+
+  const changeVoiceConsent = checked => {
+    voiceConsentRef.current = checked;
+    setVoiceConsent(checked);
+    if (!checked) {
+      stopRecording();
+      setVoiceBlob(null);
+      setVoiceDuration(0);
+    }
+  };
 
   return (
     <div className="avatar-onboarding-backdrop">
@@ -290,7 +305,7 @@ export default function AvatarOnboardingModal({ isOpen, onClose, onComplete }) {
               <h3>Optional voice reference</h3>
               <p>Voice cloning is not active. A five-second sample can be saved locally for a future caregiver-enabled feature.</p>
               <label className="avatar-consent-row">
-                <input type="checkbox" checked={voiceConsent} onChange={event => setVoiceConsent(event.target.checked)} />
+                <input type="checkbox" checked={voiceConsent} onChange={event => changeVoiceConsent(event.target.checked)} />
                 Save this voice sample only on this device
               </label>
               <div className="avatar-recording-controls">

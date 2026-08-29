@@ -62,6 +62,19 @@ def test_audio_chat_transcribes_on_cpu():
     assert response.status_code == 200
     assert response.json()["inputText"] == "Hello there"
 
+
+def test_chat_rejects_oversized_history():
+    app.state.gemini = FakeGemini()
+    response = client.post(
+        "/api/chat/interact",
+        data={
+            "text": "Hello there",
+            "history": json.dumps([{"role": "user", "text": "x" * 20_000}]),
+        },
+    )
+    assert response.status_code == 400
+    assert "history" in response.json()["detail"].lower()
+
 def test_voice_enrollment_is_disabled():
     dummy_wav = io.BytesIO(b"RIFF....WAVEfmt ....data....")
     response = client.post(

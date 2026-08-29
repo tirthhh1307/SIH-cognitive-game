@@ -13,6 +13,7 @@ from backend.services.viseme_service import rhubarb_available
 
 MAX_AUDIO_BYTES = 10 * 1024 * 1024
 MAX_TEXT_LENGTH = 2000
+MAX_HISTORY_LENGTH = 20_000
 
 app = FastAPI(title="Avatar Voice & Lip-Sync Backend")
 
@@ -29,8 +30,7 @@ app.state.transcriber = WhisperTranscriber()
 app.state.voice = ChatterboxAdapter()
 
 @app.post("/api/voice/enroll")
-async def enroll_voice(profile_id: str = Form(...), file: UploadFile = File(...)):
-    del profile_id, file
+async def enroll_voice():
     raise HTTPException(status_code=503, detail="Voice cloning is disabled.")
 
 @app.post("/api/chat/interact")
@@ -47,6 +47,8 @@ async def chat_interact(
         raise HTTPException(status_code=400, detail="Provide text or audio, but not both.")
     if len(submitted_text) > MAX_TEXT_LENGTH:
         raise HTTPException(status_code=400, detail="Message must be 2000 characters or fewer.")
+    if len(history) > MAX_HISTORY_LENGTH:
+        raise HTTPException(status_code=400, detail="History is too large.")
 
     try:
         parsed_history = json.loads(history)
