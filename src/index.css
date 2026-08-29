@@ -4742,7 +4742,667 @@ body, html {
 
 @media print {
   body, html, .app-root { background: #fff !important; color: #000 !important; overflow: visible !important; }
-  .scenic-backdrop, .scenic-backdrop-viewport, .scenic-slider-wrapper, .scenery-interactive-layer, .game-header, .app-nav, .footer-banner-section, .audience-switch, .baseline-list button, .game-primary-btn, .report-card button, .demo-services, .privacy-danger { display: none !important; }
+  .scenic-backdrop, .scenic-backdrop-viewport, .scenic-slider-wrapper, .scenery-interactive-layer, .game-header, .app-nav, .footer-banner-section, .audience-switch, .baseline-list button, .game-primary-btn, .report-card button, .demo-services, .privacy-danger, .share-report-section, .modal-tabs { display: none !important; }
   .main-game-container, .support-view { max-width: none; max-height: none; padding: 0; overflow: visible; box-shadow: none; }
   .support-card { break-inside: avoid; box-shadow: none; }
+}
+
+/* -------------------------------------------------------------
+   Folk Instruments Ensemble (Music & Joy)
+   ------------------------------------------------------------- */
+.folk-ensemble-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.instruments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  width: 100%;
+}
+
+.instrument-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 14px 16px;
+  border: 2px solid #e0f2fe;
+  box-shadow: 0 4px 14px rgba(2, 119, 189, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.instrument-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(2, 119, 189, 0.14);
+}
+
+.instrument-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.instrument-icon {
+  font-size: 32px;
+  background: #e0f2fe;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  flex-shrink: 0;
+}
+
+.instrument-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.instrument-info strong {
+  font-size: 15px;
+  color: #0c4a6e;
+}
+
+.instrument-info small {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+.instrument-buttons-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.instrument-play-btn {
+  flex: 1 1 calc(50% - 6px);
+  min-height: 38px;
+  background: #f0f9ff;
+  border: 1.5px solid #bae6fd;
+  color: #0369a1;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 6px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.instrument-play-btn:hover {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+  transform: scale(1.02);
+}
+
+.instrument-play-btn.playing-pulse {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+  transform: scale(0.96);
+  box-shadow: 0 0 12px rgba(2, 132, 199, 0.5);
+}
+
+.pepa-pad {
+  border-color: #f59e0b;
+  color: #b45309;
+}
+.taal-pad {
+  border-color: #10b981;
+  color: #047857;
+}
+
+/* -------------------------------------------------------------
+   Stories & Memories: Feelings & Memory Journal
+   ------------------------------------------------------------- */
+.journal-view-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.journal-editor-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px;
+  border: 2px solid #ede9fe;
+  box-shadow: 0 6px 18px rgba(106, 27, 154, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.journal-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.journal-prompt-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #4a148c;
+  margin: 0 0 4px 0;
+}
+
+.journal-prompt-sub {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.mood-picker-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mood-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.mood-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mood-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #fdf4ff;
+  border: 1.5px solid #f0abfc;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #86198f;
+  transition: all 0.2s ease;
+}
+
+.mood-chip:hover {
+  background: #fae8ff;
+  transform: translateY(-1px);
+}
+
+.mood-chip.selected {
+  background: #a855f7;
+  color: #ffffff;
+  border-color: #9333ea;
+  box-shadow: 0 4px 10px rgba(168, 85, 247, 0.35);
+}
+
+.journal-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.journal-field-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.journal-input-about {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1.5px solid #cbd5e1;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.journal-input-about:focus {
+  border-color: #7e22ce;
+  box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.15);
+}
+
+.journal-textarea {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid #cbd5e1;
+  font-size: 15px;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 90px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.journal-textarea:focus {
+  border-color: #7e22ce;
+  box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.15);
+}
+
+.journal-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.journal-save-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #7e22ce, #9333ea);
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+.journal-success-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1.5px solid #a7f3d0;
+  padding: 10px 16px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.past-journal-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.past-entries-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #334155;
+  margin: 0;
+}
+
+.journal-entries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.journal-entry-card {
+  background: #faf5ff;
+  border: 1.5px solid #e9d5ff;
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entry-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.entry-mood {
+  font-size: 18px;
+}
+
+.entry-about {
+  color: #6b21a8;
+  flex: 1;
+}
+
+.entry-date {
+  color: #94a3b8;
+  font-size: 12px;
+  margin-left: auto;
+}
+
+.entry-text {
+  font-size: 14px;
+  color: #1e293b;
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.entry-listen-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #d8b4fe;
+  color: #7e22ce;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: all 0.15s ease;
+}
+
+.entry-listen-btn:hover {
+  background: #7e22ce;
+  color: #ffffff;
+}
+
+.journal-empty-copy {
+  font-size: 13px;
+  color: #94a3b8;
+  font-style: italic;
+  margin: 0;
+}
+
+/* -------------------------------------------------------------
+   Practice Progress SVG Chart (Caregiver Dashboard)
+   ------------------------------------------------------------- */
+.practice-trend-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.card-title-icon {
+  margin-right: 6px;
+  vertical-align: middle;
+  color: #2e7d32;
+}
+
+.practice-graph-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.graph-meta-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.graph-stat-badge {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 120px;
+}
+
+.graph-stat-badge span {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.graph-stat-badge strong {
+  font-size: 16px;
+  color: #1e293b;
+}
+
+.graph-stat-badge strong.trend-up {
+  color: #15803d;
+}
+
+.graph-stat-badge strong.trend-steady {
+  color: #0284c7;
+}
+
+.practice-svg-container {
+  width: 100%;
+  overflow-x: auto;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 10px 6px;
+}
+
+.practice-progress-svg {
+  width: 100%;
+  min-width: 420px;
+  height: auto;
+  display: block;
+}
+
+.graph-point-group circle {
+  transition: r 0.2s ease, stroke-width 0.2s ease;
+}
+
+.graph-point-group:hover circle {
+  r: 7;
+  stroke-width: 3.5;
+  stroke: #1b5e20;
+}
+
+.graph-caption {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+  font-style: italic;
+}
+
+.practice-graph-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  color: #94a3b8;
+  text-align: center;
+  gap: 8px;
+}
+
+/* -------------------------------------------------------------
+   Share Progress Report to Familiar People (Caregiver Dashboard)
+   ------------------------------------------------------------- */
+.share-report-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.share-contacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  width: 100%;
+}
+
+.share-contact-card {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.share-contact-card:hover {
+  border-color: #2e7d32;
+  transform: translateY(-2px);
+}
+
+.contact-card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.contact-avatar-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #fce4ec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contact-details strong {
+  font-size: 15px;
+  color: #1e293b;
+}
+
+.contact-details span {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.contact-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #0284c7;
+  font-weight: 600;
+}
+
+.contact-phone.no-phone {
+  color: #94a3b8;
+  font-style: italic;
+  font-weight: normal;
+}
+
+.contact-share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.share-btn {
+  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.whatsapp-share {
+  background: #25d366;
+  color: #ffffff;
+}
+
+.whatsapp-share:hover {
+  background: #1ebc57;
+  transform: scale(1.02);
+}
+
+.sms-share {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.sms-share:hover {
+  background: #0369a1;
+  transform: scale(1.02);
+}
+
+.copy-share {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.copy-share:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.share-empty-box {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 18px;
+  padding: 20px;
+  color: #64748b;
+}
+
+.share-empty-box strong {
+  display: block;
+  font-size: 14px;
+  color: #1e293b;
+  margin-bottom: 2px;
+}
+
+.share-empty-box p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.anchor-phone-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  color: #0369a1;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-top: 4px;
+}
+
+.anchor-phone-tag a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.anchor-phone-tag a:hover {
+  text-decoration: underline;
 }

@@ -17,7 +17,7 @@ import { toggleMute, playStarSound } from './utils/audio';
 import { speakText } from './utils/speech';
 import { AppNav } from './components/AppNav';
 import { ConsentGate } from './components/ConsentGate';
-import { clearPlatformData, createInitialState, getAdaptiveDifficulty, loadPlatformState, recordAttempt, savePlatformState } from './utils/platform';
+import { addJournalEntry, clearPlatformData, createInitialState, getAdaptiveDifficulty, loadPlatformState, recordAttempt, savePlatformState } from './utils/platform';
 import { GameLibrary } from './components/GameLibrary';
 import { GameRunner } from './components/games/GameRunner';
 import { DailyCheckIn } from './components/DailyCheckIn';
@@ -101,6 +101,10 @@ export default function App() {
   };
 
   const handleOpenGame = (gameId) => {
+    if (gameId === 'play' || gameId === 'mind-games') {
+      setActiveView('play');
+      return;
+    }
     setActiveModal(gameId);
   };
 
@@ -224,7 +228,7 @@ export default function App() {
 
   const categoryCards = [
     {
-      id: 'mind-games',
+      id: 'play',
       title: t(language, 'card.mindGames.title'),
       description: t(language, 'card.mindGames.desc'),
       icon: BrainSunburstIcon,
@@ -328,6 +332,7 @@ export default function App() {
           <main className="platform-view-shell">
             <CaregiverDashboard
               state={platformState}
+              anchors={anchors}
               anchorCount={anchors.length}
               language={language}
               onStateChange={setPlatformState}
@@ -381,7 +386,14 @@ export default function App() {
       )}
 
       {activeModal === 'stories-memories' && (
-        <StoriesMemoriesModal onClose={handleCloseModal} onEarnStars={handleEarnStars} />
+        <StoriesMemoriesModal
+          onClose={handleCloseModal}
+          onEarnStars={handleEarnStars}
+          playerName={playerName}
+          language={language}
+          journalEntries={platformState.journalEntries || []}
+          onSaveJournal={(entry) => setPlatformState(prev => addJournalEntry(prev, entry))}
+        />
       )}
 
       {showProfileModal && (

@@ -16,5 +16,10 @@ test('anchor rejects unsupported or oversized media before storage', () => {
 });
 
 test('valid anchor input returns no error', () => {
-  assert.equal(validateAnchorInput({ name: ' Mina ', relationship: ' Daughter ', photoBlob: file('image/png', 100), audioBlob: file('audio/webm', 100) }), '');
+  assert.equal(validateAnchorInput({ name: ' Mina ', relationship: ' Daughter ', phone: '+91 98765 43210', photoBlob: file('image/png', 100), audioBlob: file('audio/webm', 100) }), '');
 });
+
+test('anchor rejects oversized phone number', () => {
+  assert.equal(validateAnchorInput({ name: 'Mina', relationship: 'Daughter', phone: '1'.repeat(35) }), 'Phone number must be 30 characters or fewer.');
+});
+

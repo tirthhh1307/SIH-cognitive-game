@@ -7,6 +7,7 @@ export function validateAnchorInput(anchor) {
   if (!anchor.name?.trim()) return 'Name is required.';
   if (!anchor.relationship?.trim()) return 'Relationship is required.';
   if (anchor.name.trim().length > 60 || anchor.relationship.trim().length > 60) return 'Name and relationship must be 60 characters or fewer.';
+  if (anchor.phone && anchor.phone.trim().length > 30) return 'Phone number must be 30 characters or fewer.';
   if (anchor.photoBlob) {
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(anchor.photoBlob.type)) return 'Photo must be JPG, PNG, or WebP.';
     if (anchor.photoBlob.size > 5 * 1024 * 1024) return 'Photo must be 5 MB or smaller.';
@@ -58,7 +59,12 @@ export async function listAnchors() {
 export async function putAnchor(anchor) {
   const error = validateAnchorInput(anchor);
   if (error) throw new Error(error);
-  const normalized = { ...anchor, name: anchor.name.trim(), relationship: anchor.relationship.trim() };
+  const normalized = {
+    ...anchor,
+    name: anchor.name.trim(),
+    relationship: anchor.relationship.trim(),
+    phone: anchor.phone?.trim() || ''
+  };
   await requestFromStore(ANCHOR_STORE, 'readwrite', store => store.put(normalized));
   return normalized;
 }

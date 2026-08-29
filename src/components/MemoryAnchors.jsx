@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ImagePlus, Mic, ShieldCheck, Trash2, Users } from 'lucide-react';
+import { ImagePlus, Mic, Phone, ShieldCheck, Trash2, Users } from 'lucide-react';
 import { deleteAnchor, putAnchor, validateAnchorInput } from '../utils/mediaStore';
 import { t } from '../data/i18n';
 
@@ -12,7 +12,17 @@ function AnchorCard({ anchor, onDelete }) {
   }, [photoUrl, audioUrl]);
   return <article className="anchor-card">
     <div className="anchor-photo">{photoUrl ? <img src={photoUrl} alt={anchor.name} /> : <Users size={38} aria-hidden="true" />}</div>
-    <div className="anchor-info"><h3>{anchor.name}</h3><p>{anchor.relationship}</p>{audioUrl ? <audio controls src={audioUrl} aria-label={`Voice note from ${anchor.name}`} /> : <small>No voice note</small>}</div>
+    <div className="anchor-info">
+      <h3>{anchor.name}</h3>
+      <p>{anchor.relationship}</p>
+      {anchor.phone && (
+        <div className="anchor-phone-tag">
+          <Phone size={13} />
+          <a href={`tel:${anchor.phone}`} title="Call familiar contact">{anchor.phone}</a>
+        </div>
+      )}
+      {audioUrl ? <audio controls src={audioUrl} aria-label={`Voice note from ${anchor.name}`} /> : <small>No voice note</small>}
+    </div>
     <button className="delete-icon-btn" onClick={() => onDelete(anchor)} aria-label={`Delete memory for ${anchor.name}`}><Trash2 size={18} /></button>
   </article>;
 }
@@ -20,6 +30,7 @@ function AnchorCard({ anchor, onDelete }) {
 export function MemoryAnchors({ anchors, onChanged, language = 'en' }) {
   const [name, setName] = useState('');
   const [relationship, setRelationship] = useState('');
+  const [phone, setPhone] = useState('');
   const [photoBlob, setPhotoBlob] = useState(null);
   const [audioBlob, setAudioBlob] = useState(null);
   const [error, setError] = useState('');
@@ -28,7 +39,7 @@ export function MemoryAnchors({ anchors, onChanged, language = 'en' }) {
   const save = async event => {
     event.preventDefault();
     const formElement = event.currentTarget;
-    const input = { name, relationship, photoBlob, audioBlob };
+    const input = { name, relationship, phone, photoBlob, audioBlob };
     const validationError = validateAnchorInput(input);
     if (validationError) { setError(validationError); return; }
     try {
@@ -37,8 +48,8 @@ export function MemoryAnchors({ anchors, onChanged, language = 'en' }) {
         id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}`,
         createdAt: new Date().toISOString()
       });
-      setName(''); setRelationship(''); setPhotoBlob(null); setAudioBlob(null); setError('');
-      setMessage(`${name.trim()} is ready for personalized games.`);
+      setName(''); setRelationship(''); setPhone(''); setPhotoBlob(null); setAudioBlob(null); setError('');
+      setMessage(`${name.trim()} is ready for personalized games & report sharing.`);
       await onChanged();
       formElement.reset();
     } catch {
@@ -53,12 +64,13 @@ export function MemoryAnchors({ anchors, onChanged, language = 'en' }) {
   };
 
   return <section className="platform-view support-view anchors-view" aria-labelledby="anchors-title">
-    <div className="view-heading"><div><p className="eyebrow">Personalized &amp; private</p><h2 id="anchors-title">{t(language, 'anchors.title')}</h2><p>Add familiar people for face, family-tree, photo, and voice games.</p></div><span className="local-only-badge"><ShieldCheck size={18} />On this device</span></div>
+    <div className="view-heading"><div><p className="eyebrow">Personalized &amp; private</p><h2 id="anchors-title">{t(language, 'anchors.title')}</h2><p>Add familiar people for face, family-tree, photo, voice games, and report sharing.</p></div><span className="local-only-badge"><ShieldCheck size={18} />On this device</span></div>
     <div className="anchor-layout">
       <form className="support-card anchor-form" onSubmit={save}>
         <h3>Add a familiar person</h3>
         <label className="stacked-field"><span>Name</span><input required maxLength="60" value={name} onChange={event => setName(event.target.value)} placeholder="Mina" /></label>
         <label className="stacked-field"><span>Relationship</span><input required maxLength="60" value={relationship} onChange={event => setRelationship(event.target.value)} placeholder="Daughter" /></label>
+        <label className="stacked-field"><span>Phone Number (for progress reports)</span><input type="tel" maxLength="30" value={phone} onChange={event => setPhone(event.target.value)} placeholder="+91 98765 43210" /></label>
         <label className="file-field"><ImagePlus size={23} /><span><strong>Photo</strong><small>JPG, PNG, or WebP · max 5 MB</small></span><input type="file" accept="image/jpeg,image/png,image/webp" onChange={event => setPhotoBlob(event.target.files?.[0] ?? null)} /></label>
         <label className="file-field"><Mic size={23} /><span><strong>Voice note</strong><small>Any browser-supported audio · max 8 MB</small></span><input type="file" accept="audio/*" onChange={event => setAudioBlob(event.target.files?.[0] ?? null)} /></label>
         <button className="game-primary-btn" type="submit">Save memory anchor</button>
@@ -72,3 +84,4 @@ export function MemoryAnchors({ anchors, onChanged, language = 'en' }) {
     </div>
   </section>;
 }
+

@@ -11,7 +11,8 @@ import {
   upsertReminder,
   removeReminder,
   getDueReminders,
-  setBaselineFromAttempts
+  setBaselineFromAttempts,
+  addJournalEntry
 } from '../src/utils/platform.js';
 
 const game = {
@@ -103,3 +104,12 @@ test('baseline averages requested completed games by category', () => {
   state = setBaselineFromAttempts(state, ['card-match']);
   assert.equal(state.baseline['working-memory'], 70);
 });
+
+test('addJournalEntry prepends valid reflection note', () => {
+  let state = createInitialState();
+  const entry = { id: 'j1', text: 'Peaceful day with tea', mood: '🌸', about: 'Morning' };
+  state = addJournalEntry(state, entry);
+  assert.equal(state.journalEntries.length, 1);
+  assert.equal(state.journalEntries[0].text, 'Peaceful day with tea');
+});
+
