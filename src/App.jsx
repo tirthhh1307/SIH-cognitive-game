@@ -11,6 +11,7 @@ import { SettingsModal } from './components/SettingsModal';
 import { BrainSunburstIcon, SproutGardenIcon, MusicNotesIcon, PhotoMemoryIcon } from './components/CardIcons';
 import { MindGamesModal } from './components/games/MindGamesModal';
 import { MemoryGardenModal } from './components/games/MemoryGardenModal';
+import { MemoryGardenView } from './components/garden/MemoryGardenView';
 import { MusicJoyModal } from './components/games/MusicJoyModal';
 import { StoriesMemoriesModal } from './components/games/StoriesMemoriesModal';
 import { toggleMute, playStarSound } from './utils/audio';
@@ -25,6 +26,10 @@ import { MemoryAnchors } from './components/MemoryAnchors';
 import { clearAnchors, clearAvatarMedia, listAnchors } from './utils/mediaStore';
 import { CaregiverDashboard } from './components/CaregiverDashboard';
 import { ProfileModal } from './components/ProfileModal';
+import { CaregiverPinModal } from './components/caregiver/CaregiverPinModal';
+import { AshaPatientSwitcher } from './components/caregiver/AshaPatientSwitcher';
+import { getActivePatient } from './utils/platform';
+import { getSyncStatus, flushSyncQueue, registerAutoSync } from './utils/syncQueue';
 import { getGame } from './data/games';
 import { t, LANGUAGES } from './data/i18n';
 
@@ -38,6 +43,12 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showAvatarOnboarding, setShowAvatarOnboarding] = useState(false);
+  const [showAshaModal, setShowAshaModal] = useState(false);
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [isCaregiverUnlocked, setIsCaregiverUnlocked] = useState(false);
+  const [pendingView, setPendingView] = useState(null);
+  const [syncStatus, setSyncStatus] = useState(() => getSyncStatus(localStorage));
+  const [syncToast, setSyncToast] = useState('');
   const [starNotification, setStarNotification] = useState(null);
   const [selectedGame, setSelectedGame] = useState(null);
   const [togetherMode, setTogetherMode] = useState(false);
@@ -85,6 +96,38 @@ export default function App() {
     return () => window.removeEventListener('keydown', closeOnEscape);
   }, []);
 
+  // Auto-sync outbox queue when internet reconnects
+  useEffect(() => {
+    const unregister = registerAutoSync((result) => {
+      setSyncStatus(getSyncStatus(localStorage));
+      if (result && result.count > 0) {
+        setSyncToast(`Auto-synced ${result.count} records with health portal!`);
+        setTimeout(() => setSyncToast(''), 3000);
+      }
+    }, localStorage);
+    return () => unregister();
+  }, []);
+
+  const handleTriggerSync = async () => {
+    const res = await flushSyncQueue({}, localStorage);
+    setSyncStatus(getSyncStatus(localStorage));
+    if (res.success) {
+      setSyncToast(res.count > 0 ? `Synced ${res.count} records to regional health dashboard!` : 'All records are up to date.');
+    } else {
+      setSyncToast(res.message || 'Offline: changes kept in outbox queue.');
+    }
+    setTimeout(() => setSyncToast(''), 3000);
+  };
+
+  const handleNavigate = (view) => {
+    if (view === 'caregiver' && !isCaregiverUnlocked) {
+      setPendingView(view);
+      setShowPinModal(true);
+      return;
+    }
+    setActiveView(view);
+  };
+
   const handleEarnStars = (amount, reason) => {
     setPlatformState(prev => ({ ...prev, stars: prev.stars + amount }));
     playStarSound();
@@ -103,6 +146,10 @@ export default function App() {
   const handleOpenGame = (gameId) => {
     if (gameId === 'play' || gameId === 'mind-games') {
       setActiveView('play');
+      return;
+    }
+    if (gameId === 'memory-garden') {
+      setActiveView('garden');
       return;
     }
     setActiveModal(gameId);
@@ -274,13 +321,17 @@ export default function App() {
           stars={stars}
           onOpenSettings={() => setShowSettings(true)}
           onOpenProfile={() => setShowProfileModal(true)}
+          onOpenAshaRoster={() => setShowAshaModal(true)}
+          syncStatus={syncStatus}
+          onTriggerSync={handleTriggerSync}
+          activePatient={getActivePatient(platformState)}
           isMuted={settings.muted}
           onToggleMute={handleToggleMute}
           language={language}
           onLanguageChange={handleLanguageChange}
         />
 
-        {activeView !== 'companion' && <AppNav activeView={activeView} onNavigate={setActiveView} language={language} />}
+        {activeView !== 'companion' && <AppNav activeView={activeView} onNavigate={handleNavigate} language={language} />}
 
         {activeView === 'home' ? (
           <main className="categories-grid-section">
@@ -328,6 +379,15 @@ export default function App() {
           <main className="platform-view-shell">
             <MemoryAnchors anchors={anchors} onChanged={refreshAnchors} language={language} />
           </main>
+        ) : activeView === 'garden' ? (
+          <main className="platform-view-shell zen-garden-shell">
+            <MemoryGardenView
+              state={platformState}
+              onStateChange={setPlatformState}
+              onBackHome={() => setActiveView('home')}
+              language={language}
+            />
+          </main>
         ) : activeView === 'caregiver' ? (
           <main className="platform-view-shell">
             <CaregiverDashboard
@@ -348,7 +408,7 @@ export default function App() {
           </main>
         )}
 
-      {activeView !== 'companion' && <footer className={`footer-banner-section ${activeView === 'home' ? 'footer-home-layout' : ''}`}>
+      {activeView !== 'companion' && activeView !== 'garden' && <footer className={`footer-banner-section ${activeView === 'home' ? 'footer-home-layout' : ''}`}>
           {activeView === 'home' && (
             <div className="home-footer-left">
               <WeatherWidget language={language} />
@@ -466,6 +526,45 @@ export default function App() {
           ...prev,
           consent: { accepted: true, acceptedAt: new Date().toISOString() }
         }))} />
+      )}
+
+      {/* Caregiver 4-Digit Clinical PIN Modal */}
+      {showPinModal && (
+        <CaregiverPinModal
+          state={platformState}
+          onStateChange={setPlatformState}
+          onUnlocked={() => {
+            setIsCaregiverUnlocked(true);
+            setShowPinModal(false);
+            if (pendingView) {
+              setActiveView(pendingView);
+              setPendingView(null);
+            }
+          }}
+          onClose={() => {
+            setShowPinModal(false);
+            setPendingView(null);
+          }}
+        />
+      )}
+
+      {/* ASHA Community Health Worker Multi-Patient Switcher */}
+      {showAshaModal && (
+        <AshaPatientSwitcher
+          state={platformState}
+          onStateChange={(nextState) => {
+            setPlatformState(nextState);
+            setSyncStatus(getSyncStatus(localStorage));
+          }}
+          onClose={() => setShowAshaModal(false)}
+        />
+      )}
+
+      {/* Global Sync Notification Toast */}
+      {syncToast && (
+        <div className="global-sync-toast" role="status" aria-live="polite">
+          <span>{syncToast}</span>
+        </div>
       )}
     </div>
   );

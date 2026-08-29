@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings, Star, Volume2, VolumeX } from 'lucide-react';
+import { Settings, Star, Volume2, VolumeX, Users, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 import { GoldenDivider } from './CulturalPattern';
 import { playClickSound } from '../utils/audio';
 import { t } from '../data/i18n';
@@ -11,17 +11,31 @@ export function Header({
   stars = 120, 
   onOpenSettings, 
   onOpenProfile, 
+  onOpenAshaRoster,
+  syncStatus = { status: 'synced', pendingCount: 0, isOnline: true },
+  onTriggerSync,
+  activePatient,
   isMuted, 
   onToggleMute,
   language = 'en',
   onLanguageChange
 }) {
   const [avatarFailed, setAvatarFailed] = useState(false);
+  const [isSyncingLocal, setIsSyncingLocal] = useState(false);
   const avatarImageSrc = getAvatarSrc(avatar);
+
+  const handleSyncClick = async () => {
+    if (onTriggerSync) {
+      setIsSyncingLocal(true);
+      await onTriggerSync();
+      setTimeout(() => setIsSyncingLocal(false), 500);
+    }
+  };
 
   return (
     <header className="game-header">
       <div className="header-left-cluster">
+        {/* Profile Avatar Pill */}
         <button
           type="button"
           className="profile-pill" 
@@ -40,6 +54,62 @@ export function Header({
             <span className="greeting-text">{t(language, 'header.hello')}</span>
             <span className="player-name">{playerName}</span>
           </div>
+        </button>
+
+        {/* ASHA Multi-Patient Quick Switcher Pill */}
+        {onOpenAshaRoster && (
+          <button
+            type="button"
+            className="header-asha-patient-pill"
+            onClick={() => { playClickSound(); onOpenAshaRoster(); }}
+            title="ASHA Community Worker: Switch active village elder profile"
+            aria-label="ASHA Village Patient Switcher"
+          >
+            <div className="asha-pill-icon">
+              <Users size={16} />
+            </div>
+            <div className="asha-pill-text">
+              <span className="asha-tag">ASHA PATIENT</span>
+              <span className="asha-patient-title">
+                {activePatient?.name || playerName} {activePatient?.village ? `(${activePatient.village.split(',')[0]})` : ''}
+              </span>
+            </div>
+          </button>
+        )}
+
+        {/* Offline / Cloud Sync Queue Status Badge */}
+        <button
+          type="button"
+          className={`header-sync-badge sync-${syncStatus.status} ${isSyncingLocal ? 'syncing-spin' : ''}`}
+          onClick={handleSyncClick}
+          title={
+            syncStatus.status === 'synced'
+              ? '🟢 All local records synced with central health portal (Click to verify)'
+              : syncStatus.status === 'queued'
+              ? `🟡 ${syncStatus.pendingCount} offline records in outbox queue (Click to sync now)`
+              : '🔴 Device is offline. Changes safely queued in local storage'
+          }
+          aria-label="Offline Sync Status"
+        >
+          {isSyncingLocal ? (
+            <RefreshCw size={14} className="spin-icon" />
+          ) : syncStatus.status === 'synced' ? (
+            <span className="sync-dot-green">●</span>
+          ) : syncStatus.status === 'queued' ? (
+            <span className="sync-dot-amber">●</span>
+          ) : (
+            <WifiOff size={14} />
+          )}
+
+          <span className="sync-badge-text">
+            {isSyncingLocal
+              ? 'Syncing...'
+              : syncStatus.status === 'synced'
+              ? 'Cloud Synced'
+              : syncStatus.status === 'queued'
+              ? `${syncStatus.pendingCount} Queued`
+              : 'Offline Mode'}
+          </span>
         </button>
 
         {onLanguageChange && (

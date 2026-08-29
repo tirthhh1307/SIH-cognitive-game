@@ -286,8 +286,17 @@ export const GAMES = [
       ]
     }),
   game('festival-match', 'Festival Memory Match', 'cultural-long-term', ['mild', 'moderate'], 'match',
-    'Match festivals with familiar regional symbols.', 'Find every matching festival pair.', {
-      pairs: [pair('bihu', 'Bihu', '🪘'), pair('hornbill', 'Hornbill Festival', '🐦'), pair('losar', 'Losar', '🏔️'), pair('chapchar', 'Chapchar Kut', '🎋'), pair('wangala', 'Wangala', '🥁'), pair('kharchi', 'Kharchi Puja', '🛕')]
+    'Match festivals with familiar regional symbols across all 8 North Eastern sister states.', 'Find every matching festival pair.', {
+      pairs: [
+        pair('bihu', 'Bihu (Assam)', '🪘'),
+        pair('hornbill', 'Hornbill (Nagaland)', '🐦'),
+        pair('losar', 'Losar (Sikkim)', '🏔️'),
+        pair('chapchar', 'Chapchar Kut (Mizoram)', '🎋'),
+        pair('wangala', 'Wangala (Meghalaya)', '🥁'),
+        pair('kharchi', 'Kharchi Puja (Tripura)', '🛕'),
+        pair('rasleela', 'Ras Leela (Manipur)', '🌸'),
+        pair('torgya', 'Torgya (Arunachal)', '🎭')
+      ]
     }),
   game('folk-story-sequence', 'Folk Story Sequencing', 'cultural-long-term', ['moderate'], 'sequence',
     'Arrange gentle regional story moments.', 'Tap the story panels from beginning to end.', {

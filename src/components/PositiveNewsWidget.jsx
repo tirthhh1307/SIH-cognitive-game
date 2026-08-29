@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Globe, ChevronLeft, ChevronRight, Volume2, Sparkles, Heart } from 'lucide-react';
+import { Globe, ChevronLeft, ChevronRight, Volume2, Sparkles, ThumbsUp } from 'lucide-react';
 import { POSITIVE_NEWS } from '../data/positiveNews';
 import { speakText } from '../utils/speech';
 import { playClickSound, playSuccessSound } from '../utils/audio';
@@ -7,7 +7,7 @@ import { playClickSound, playSuccessSound } from '../utils/audio';
 export function PositiveNewsWidget({ language = 'en' }) {
   const [index, setIndex] = useState(0);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [heartSparkle, setHeartSparkle] = useState(false);
+  const [cheerSparkle, setCheerSparkle] = useState(false);
   const [cheerCount, setCheerCount] = useState(12);
 
   const currentNews = POSITIVE_NEWS[index] || POSITIVE_NEWS[0];
@@ -46,8 +46,8 @@ export function PositiveNewsWidget({ language = 'en' }) {
     e.stopPropagation();
     try { playSuccessSound(); } catch {}
     setCheerCount(c => c + 1);
-    setHeartSparkle(true);
-    setTimeout(() => setHeartSparkle(false), 1200);
+    setCheerSparkle(true);
+    setTimeout(() => setCheerSparkle(false), 1200);
   };
 
   const widgetHeaderMap = {
@@ -108,7 +108,7 @@ export function PositiveNewsWidget({ language = 'en' }) {
               title="Celebrate this good news!"
               aria-label="Celebrate news"
             >
-              <Heart size={14} className={heartSparkle ? 'heart-bounce' : ''} fill={heartSparkle ? '#E53935' : 'none'} color={heartSparkle ? '#E53935' : '#E53935'} />
+              <Sparkles size={14} className={cheerSparkle ? 'sparkle-bounce' : ''} color={cheerSparkle ? '#F57F17' : '#0277BD'} />
               <span className="cheer-count">{cheerCount}</span>
             </button>
 

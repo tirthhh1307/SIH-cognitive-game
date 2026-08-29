@@ -3,7 +3,10 @@ export const LANGUAGES = {
   as: 'অসমীয়া (Assamese)',
   hi: 'हिन्दी (Hindi)',
   mni: 'মৈতৈলোন্ (Manipuri)',
-  trp: 'ককবরক (Tripuri)'
+  trp: 'ককবরক (Tripuri)',
+  mzo: 'Mizo ṭawng (Mizoram)',
+  kha: 'Khasi (Meghalaya)',
+  npi: 'नेपाली (Sikkim)'
 };
 
 const messages = {

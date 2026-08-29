@@ -1087,6 +1087,7 @@ body, html {
   margin-top: 1px;
   display: -webkit-box;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -1098,6 +1099,7 @@ body, html {
   line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   margin-top: 1px;
@@ -5406,3 +5408,1763 @@ body, html {
 .anchor-phone-tag a:hover {
   text-decoration: underline;
 }
+
+/* ==========================================================================
+   PLANTS VS. ZOMBIES 3D ZEN GREENHOUSE STYLES
+   ========================================================================== */
+
+.zen-garden-shell {
+  padding: 0;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.pvz-greenhouse-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 88vh;
+  border-radius: 26px;
+  overflow: hidden;
+  background: #E8F5E9;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2), inset 0 2px 6px rgba(255, 255, 255, 0.6);
+  border: 3px solid #81C784;
+}
+
+/* Glass Greenhouse Canopy & Natural Backdrop */
+.greenhouse-glass-canopy {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(180deg, rgba(200, 230, 201, 0.7) 0%, rgba(232, 245, 233, 0.2) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.treetop-foliage-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(ellipse at 15% 10%, rgba(76, 175, 80, 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse at 85% 15%, rgba(139, 195, 74, 0.35) 0%, transparent 60%);
+}
+
+.sunlight-caustic-rays {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.25) 0px,
+    rgba(255, 255, 255, 0.25) 40px,
+    transparent 40px,
+    transparent 110px
+  );
+  opacity: 0.7;
+  animation: gentleRayShift 12s infinite alternate ease-in-out;
+}
+
+@keyframes gentleRayShift {
+  0% { transform: translateX(-20px); opacity: 0.6; }
+  100% { transform: translateX(20px); opacity: 0.85; }
+}
+
+/* Top Bar */
+.pvz-garden-topbar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: linear-gradient(180deg, #4E342E 0%, #3E2723 100%);
+  border-bottom: 4px solid #271406;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Top Left: Zen Nursery Market & Home */
+.topbar-left-cluster {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pvz-market-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: linear-gradient(180deg, #FFB300 0%, #FF8F00 100%);
+  border: 2px solid #FFE082;
+  border-bottom: 4px solid #C67100;
+  border-radius: 14px;
+  color: #3E2723;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(255, 143, 0, 0.45);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pvz-market-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 18px rgba(255, 143, 0, 0.6);
+}
+
+.pvz-market-btn:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+}
+
+.market-icon-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #FFF8E1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #E65100;
+}
+
+.market-text-stack {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.market-label-main {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #4E342E;
+}
+
+.market-label-sub {
+  font-size: 10px;
+  font-weight: 700;
+  color: #795548;
+}
+
+.pvz-home-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #5D4037;
+  border: 1.5px solid #8D6E63;
+  border-radius: 12px;
+  color: #EFEBE9;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pvz-home-btn:hover {
+  background: #6D4C41;
+  transform: translateX(-2px);
+}
+
+/* Center Title */
+.topbar-center-title {
+  text-align: center;
+}
+
+.greenhouse-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #FFD54F;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.5px;
+}
+
+.greenhouse-sub {
+  font-size: 11px;
+  font-weight: 600;
+  color: #C8E6C9;
+  margin: 2px 0 0;
+}
+
+/* Top Right Cluster */
+.topbar-right-cluster {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pvz-star-wallet {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #2E1C11;
+  border: 2px solid #FFD54F;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.wallet-star-icon {
+  font-size: 20px;
+  animation: gentlePulse 2s infinite ease-in-out;
+}
+
+.wallet-star-count {
+  font-size: 18px;
+  font-weight: 900;
+  color: #FFD54F;
+}
+
+.wallet-star-tag {
+  font-size: 10px;
+  font-weight: 800;
+  color: #FFA000;
+}
+
+.pvz-audio-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1.5px solid transparent;
+}
+
+.pvz-audio-toggle.bgm-on {
+  background: #1B5E20;
+  border-color: #81C784;
+  color: #C8E6C9;
+}
+
+.pvz-audio-toggle.bgm-off {
+  background: #455A64;
+  border-color: #78909C;
+  color: #CFD8DC;
+}
+
+.pvz-help-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #5D4037;
+  border: 1.5px solid #8D6E63;
+  color: #FFD54F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pvz-help-btn:hover {
+  background: #6D4C41;
+  transform: scale(1.08);
+}
+
+/* Feedback Banner */
+.pvz-feedback-banner {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: linear-gradient(180deg, #2E7D32 0%, #1B5E20 100%);
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 800;
+  border-radius: 30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border: 2px solid #81C784;
+  animation: slideDownToast 0.3s ease;
+}
+
+/* Help Guide Card */
+.pvz-help-card {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 995;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.pvz-help-card .help-content {
+  background: #FFF8E1;
+  border: 3px solid #FF8F00;
+  border-radius: 24px;
+  padding: 24px;
+  max-width: 520px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+  color: #3E2723;
+}
+
+.pvz-help-card h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 900;
+  color: #E65100;
+}
+
+.pvz-help-card ul {
+  padding-left: 20px;
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.help-close-hint {
+  display: block;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #8D6E63;
+}
+
+/* Main 3D Greenhouse Stage */
+.pvz-greenhouse-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 18px 80px 18px;
+  flex: 1;
+  perspective: 1200px;
+}
+
+/* PvZ Floating Tool Toolbar */
+.pvz-floating-tool-rack {
+  position: sticky;
+  top: 12px;
+  z-index: 20;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: linear-gradient(180deg, #5D4037 0%, #3E2723 100%);
+  border: 3px solid #8D6E63;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  margin-bottom: 20px;
+}
+
+.tool-rack-title {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #FFE082;
+  writing-mode: horizontal-tb;
+  padding-right: 4px;
+}
+
+.tool-slot-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  background: #4E342E;
+  border: 2px solid #6D4C41;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  min-width: 68px;
+}
+
+.tool-slot-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  border-color: #FFD54F;
+}
+
+.tool-slot-btn.active-slot {
+  background: #2E7D32;
+  border-color: #FFD54F;
+  box-shadow: 0 0 16px rgba(255, 213, 79, 0.6);
+  transform: translateY(-4px);
+}
+
+.tool-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+}
+
+.tool-badge.water-bg { background: linear-gradient(135deg, #29B6F6 0%, #0288D1 100%); }
+.tool-badge.compost-bg { background: linear-gradient(135deg, #8BC34A 0%, #558B2F 100%); }
+.tool-badge.sun-bg { background: linear-gradient(135deg, #FFD54F 0%, #FFA000 100%); color: #4E342E; }
+.tool-badge.chime-bg { background: linear-gradient(135deg, #26A69A 0%, #00796B 100%); }
+
+.tool-emoji {
+  font-size: 20px;
+}
+
+.tool-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.tool-qty {
+  font-size: 10px;
+  font-weight: 700;
+  color: #FFE082;
+}
+
+/* 4 Stepped Greenhouse Terraces (PvZ layout) */
+.greenhouse-terraces-container {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: 100%;
+}
+
+.greenhouse-terrace-row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Concrete Stepped Slab (like the white patio step in screenshot) */
+.terrace-concrete-step {
+  position: absolute;
+  bottom: 0;
+  left: -10px;
+  right: -10px;
+  height: 80px;
+  background: linear-gradient(180deg, #EDEDED 0%, #D6D6D6 60%, #BDBDBD 100%);
+  border-radius: 12px;
+  border-bottom: 6px solid #9E9E9E;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  z-index: 1;
+}
+
+.terrace-stands-row {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 0 12px;
+}
+
+@media (max-width: 768px) {
+  .terrace-stands-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Bamboo Stand Slot (Matches screenshot) */
+.bamboo-stand-slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 155px;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bamboo-stand-slot:hover {
+  transform: translateY(-5px);
+}
+
+/* PvZ Thirst/Need Care Bubble */
+.pvz-care-bubble {
+  position: absolute;
+  top: -16px;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: #FFFFFF;
+  border: 2px solid #0288D1;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #0288D1;
+  box-shadow: 0 4px 12px rgba(2, 136, 209, 0.35);
+}
+
+.bounce-bubble {
+  animation: floatBounce 1.5s infinite ease-in-out;
+}
+
+/* PvZ Spinning Golden Star Coin Drop */
+.pvz-golden-star-drop {
+  position: absolute;
+  top: -24px;
+  z-index: 18;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #FFD54F 0%, #FF8F00 100%);
+  border: 2px solid #FFF8E1;
+  border-radius: 20px;
+  box-shadow: 0 6px 18px rgba(255, 143, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  animation: starDropHover 1.6s infinite ease-in-out;
+}
+
+@keyframes starDropHover {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.08); }
+}
+
+.spinning-star-coin {
+  font-size: 18px;
+  animation: spinCoin 3s infinite linear;
+}
+
+@keyframes spinCoin {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+.star-reward-value {
+  font-size: 12px;
+  font-weight: 900;
+  color: #3E2723;
+}
+
+/* Upper Plant Display */
+.pot-stand-upper {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 85px;
+}
+
+.plant-3d-entity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.plant-icon-3d {
+  font-size: 46px;
+  display: inline-block;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  transition: transform 0.3s ease;
+  animation: plantSway 4s infinite ease-in-out;
+}
+
+@keyframes plantSway {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-2deg) scale(1.02); }
+  75% { transform: rotate(2deg) scale(0.99); }
+}
+
+.bamboo-stand-slot.radiant-bloom .plant-icon-3d {
+  filter: drop-shadow(0 0 14px rgba(255, 215, 0, 0.8));
+}
+
+.plant-title-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: -2px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2px 6px;
+  border-radius: 8px;
+  border: 1px solid #C8E6C9;
+}
+
+.plant-name-short {
+  font-size: 11px;
+  font-weight: 800;
+  color: #1B5E20;
+}
+
+.stage-pill-mini {
+  font-size: 9px;
+  font-weight: 700;
+  color: #558B2F;
+}
+
+/* Empty Stand Prompt */
+.empty-stand-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.plus-stand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px dashed #81C784;
+  color: #2E7D32;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.bamboo-stand-slot:hover .plus-stand-icon {
+  background: #C8E6C9;
+  transform: scale(1.15);
+}
+
+.stand-add-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: #558B2F;
+}
+
+/* 3D Terracotta Ceramic Pot */
+.terracotta-pot-base {
+  position: relative;
+  z-index: 4;
+  width: 58px;
+  height: 34px;
+  margin-top: -8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pot-clay-rim {
+  width: 64px;
+  height: 10px;
+  background: linear-gradient(180deg, #D87D4A 0%, #B85D2A 100%);
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  border: 1px solid #8D3C10;
+}
+
+.pot-clay-body {
+  position: relative;
+  width: 52px;
+  height: 24px;
+  background: linear-gradient(180deg, #C26330 0%, #9C4617 100%);
+  border-radius: 0 0 10px 10px;
+  border: 1px solid #752E07;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.pot-water-gauge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(41, 182, 246, 0.5);
+  transition: height 0.4s ease;
+}
+
+/* Bamboo Slat Stand Structure (Exact replica of PvZ reference screenshot) */
+.bamboo-mat-structure {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -4px;
+}
+
+.bamboo-slats {
+  width: 100%;
+  height: 38px;
+  background: linear-gradient(180deg, #D4A359 0%, #B88536 50%, #8D5C14 100%);
+  border-radius: 6px;
+  border: 2.5px solid #6E440B;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  padding: 2px 6px;
+}
+
+.bamboo-slats .slat {
+  width: 100%;
+  height: 3px;
+  background: #F4D088;
+  border-radius: 2px;
+  opacity: 0.85;
+}
+
+.bamboo-legs {
+  width: 85%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.bamboo-legs .leg {
+  width: 14px;
+  height: 10px;
+  background: linear-gradient(180deg, #8D5C14 0%, #543306 100%);
+  border-radius: 0 0 4px 4px;
+  border: 1.5px solid #3E2723;
+}
+
+/* Modals & Dialogs */
+.pvz-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  z-index: 990;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.pvz-modal-card {
+  width: 100%;
+  max-width: 640px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: #FFFDE7;
+  border: 4px solid #F57F17;
+  border-radius: 26px;
+  padding: 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.pvz-modal-card.market-card {
+  max-width: 780px;
+}
+
+.pvz-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+  border-bottom: 2px dashed #FFE082;
+}
+
+.modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-icon-badge {
+  font-size: 30px;
+}
+
+.modal-heading {
+  font-size: 18px;
+  font-weight: 900;
+  color: #E65100;
+  margin: 0;
+}
+
+.modal-subheading {
+  font-size: 12px;
+  color: #795548;
+  margin: 2px 0 0;
+}
+
+.market-header-stars {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.market-stars-amt {
+  font-size: 16px;
+  font-weight: 900;
+  color: #E65100;
+}
+
+.pvz-modal-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #FFECB3;
+  border: 2px solid #FFA000;
+  color: #E65100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pvz-modal-close:hover {
+  background: #FFE082;
+  transform: scale(1.1);
+}
+
+/* Market Tabs */
+.market-tab-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.market-tab-selector .tab-btn {
+  flex: 1;
+  padding: 10px 14px;
+  background: #FFF8E1;
+  border: 2px solid #FFE082;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #8D6E63;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.market-tab-selector .tab-btn.active-tab {
+  background: #FF8F00;
+  border-color: #E65100;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(255, 143, 0, 0.35);
+}
+
+/* Market Scroll List */
+.market-scroll-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.market-row-item {
+  display: grid;
+  grid-template-columns: 75px 1fr 125px;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 14px;
+  background: #FFFFFF;
+  border: 2px solid #FFE082;
+  border-radius: 18px;
+  transition: all 0.2s ease;
+}
+
+.market-row-item:hover {
+  border-color: #FFA000;
+  transform: translateX(4px);
+  box-shadow: 0 4px 14px rgba(255, 160, 0, 0.2);
+}
+
+.market-item-thumb {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.big-thumb-icon {
+  font-size: 40px;
+}
+
+.mini-seed-badge {
+  position: absolute;
+  bottom: -4px;
+  right: 0;
+  font-size: 16px;
+}
+
+.market-item-desc {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item-head-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-head-line h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: #2E7D32;
+}
+
+.plant-tag-pill {
+  font-size: 10px;
+  font-weight: 700;
+  color: #E65100;
+  background: #FFF8E1;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid #FFE082;
+}
+
+.item-reg-name {
+  font-size: 11px;
+  color: #388E3C;
+  margin: 0;
+}
+
+.item-fact-quote {
+  font-size: 11px;
+  color: #6D4C41;
+  margin: 2px 0 0;
+  line-height: 1.3;
+}
+
+.item-stock-stats {
+  display: flex;
+  gap: 14px;
+  font-size: 11px;
+  color: #4E342E;
+  margin-top: 4px;
+}
+
+.market-item-buy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.price-tag-gold {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 16px;
+  color: #E65100;
+}
+
+.btn-purchase {
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.btn-purchase.can-buy {
+  background: linear-gradient(180deg, #43A047 0%, #2E7D32 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 10px rgba(46, 125, 50, 0.35);
+}
+
+.btn-purchase.can-buy:hover {
+  background: #1B5E20;
+  transform: translateY(-2px);
+}
+
+.btn-purchase.cannot-buy {
+  background: #CFD8DC;
+  color: #78909C;
+  cursor: not-allowed;
+}
+
+/* Seed Picker Grid */
+.seed-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+}
+
+.seed-item-tile {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: #FFFFFF;
+  border: 2px solid #FFE082;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seed-item-tile.in-stock:hover {
+  background: #F1F8E9;
+  border-color: #66BB6A;
+  transform: translateY(-2px);
+}
+
+.seed-item-tile.out-of-stock {
+  opacity: 0.65;
+  border-style: dashed;
+}
+
+.seed-tile-icon {
+  font-size: 32px;
+}
+
+.seed-tile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.seed-tile-info h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  color: #1B5E20;
+}
+
+.seed-tile-reg {
+  font-size: 11px;
+  color: #388E3C;
+  margin: 0;
+}
+
+.seed-tile-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.tile-qty {
+  color: #E65100;
+}
+
+.tile-yield {
+  color: #2E7D32;
+}
+
+/* ==========================================================================
+   ASHA MULTI-PATIENT, OFFLINE SYNC QUEUE & PIN LOCK STYLES
+   ========================================================================== */
+
+/* ASHA Patient Pill in Header */
+.header-asha-patient-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: #EDE7F6;
+  border: 1.5px solid #D1C4E9;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.header-asha-patient-pill:hover {
+  background: #D1C4E9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(103, 58, 183, 0.2);
+}
+
+.asha-pill-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #673AB7;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.asha-pill-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.asha-tag {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #512DA8;
+}
+
+.asha-patient-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #311B92;
+}
+
+/* Header Offline / Cloud Sync Queue Badge */
+.header-sync-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1.5px solid transparent;
+}
+
+.header-sync-badge.sync-synced {
+  background: #E8F5E9;
+  border-color: #A5D6A7;
+  color: #2E7D32;
+}
+
+.header-sync-badge.sync-synced:hover {
+  background: #C8E6C9;
+}
+
+.sync-dot-green {
+  color: #43A047;
+  font-size: 14px;
+}
+
+.header-sync-badge.sync-queued {
+  background: #FFF8E1;
+  border-color: #FFE082;
+  color: #E65100;
+  animation: gentlePulse 2s infinite ease-in-out;
+}
+
+.header-sync-badge.sync-queued:hover {
+  background: #FFECB3;
+}
+
+.sync-dot-amber {
+  color: #FB8C00;
+  font-size: 14px;
+}
+
+.header-sync-badge.sync-offline {
+  background: #ECEFF1;
+  border-color: #CFD8DC;
+  color: #546E7A;
+}
+
+.header-sync-badge.syncing-spin {
+  background: #E0F2F1;
+  border-color: #80CBC4;
+  color: #00796B;
+}
+
+.spin-icon {
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Global Sync Notification Toast */
+.global-sync-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1050;
+  padding: 10px 22px;
+  background: #263238;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  border: 1px solid #455A64;
+  animation: slideUpToast 0.3s ease;
+}
+
+@keyframes slideUpToast {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* Caregiver PIN Lock Modal */
+.caregiver-pin-backdrop,
+.asha-switcher-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.caregiver-pin-card {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  background: #FFFFFF;
+  border-radius: 28px;
+  padding: 28px 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  border: 2px solid #E0E0E0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pin-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #F5F5F5;
+  border: none;
+  color: #616161;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pin-modal-close:hover {
+  background: #E0E0E0;
+  color: #212121;
+}
+
+.pin-header-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.pin-lock-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #EDE7F6;
+  color: #5E35B1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.pin-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: #212121;
+  margin: 0;
+}
+
+.pin-subtitle {
+  font-size: 12px;
+  color: #757575;
+  margin: 6px 0 0;
+  max-width: 280px;
+  line-height: 1.4;
+}
+
+.pin-dots-display {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.pin-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #BDBDBD;
+  background: #FFFFFF;
+  transition: all 0.2s ease;
+}
+
+.pin-dot.filled-dot {
+  background: #5E35B1;
+  border-color: #5E35B1;
+  transform: scale(1.15);
+  box-shadow: 0 0 10px rgba(94, 53, 177, 0.4);
+}
+
+.shake-dots {
+  animation: errorShake 0.4s ease;
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+.pin-error-alert {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #FFEBEE;
+  color: #C62828;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.pin-keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 280px;
+  margin-bottom: 18px;
+}
+
+.pin-key-btn {
+  height: 54px;
+  border-radius: 16px;
+  background: #FAFAFA;
+  border: 1.5px solid #EEEEEE;
+  font-size: 20px;
+  font-weight: 800;
+  color: #37474F;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.pin-key-btn:hover {
+  background: #EDE7F6;
+  border-color: #D1C4E9;
+  color: #5E35B1;
+  transform: scale(1.05);
+}
+
+.pin-key-btn:active {
+  transform: scale(0.95);
+  background: #D1C4E9;
+}
+
+.pin-key-btn.key-clear {
+  color: #C62828;
+  font-size: 16px;
+}
+
+.pin-key-btn.key-back {
+  color: #455A64;
+  font-size: 18px;
+}
+
+.pin-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 10px;
+  border-top: 1px solid #EEEEEE;
+}
+
+.pin-default-hint {
+  font-size: 11px;
+  color: #78909C;
+}
+
+.btn-change-pin-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #5E35B1;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.btn-change-pin-link:hover {
+  text-decoration: underline;
+}
+
+.change-pin-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 12px;
+}
+
+.pin-success-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #E8F5E9;
+  color: #2E7D32;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+  justify-content: center;
+}
+
+/* ASHA Patient Switcher Modal */
+.asha-switcher-card {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: #FFFFFF;
+  border-radius: 26px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  border: 2px solid #D1C4E9;
+}
+
+.asha-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #EDE7F6;
+  margin-bottom: 16px;
+}
+
+.asha-badge-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #EDE7F6;
+  color: #5E35B1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.asha-modal-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #311B92;
+  margin: 0;
+}
+
+.asha-modal-subtitle {
+  font-size: 12px;
+  color: #7E57C2;
+  margin: 2px 0 0;
+}
+
+.asha-toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.btn-toolbar-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #F5F5F5;
+  border: 1.5px solid #E0E0E0;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #616161;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-toolbar-toggle.active-toolbar {
+  background: #EDE7F6;
+  border-color: #673AB7;
+  color: #512DA8;
+}
+
+.btn-export-roster {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #2E7D32;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-export-roster:hover {
+  background: #1B5E20;
+  transform: translateY(-1px);
+}
+
+.patients-roster-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.patient-roster-card {
+  display: grid;
+  grid-template-columns: 50px 1fr 110px;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 14px;
+  background: #FAFAFA;
+  border: 1.5px solid #EEEEEE;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.patient-roster-card:hover {
+  background: #F3E5F5;
+  border-color: #BA68C8;
+  transform: translateX(4px);
+}
+
+.patient-roster-card.active-roster-card {
+  background: #EDE7F6;
+  border-color: #673AB7;
+  box-shadow: 0 4px 14px rgba(103, 58, 183, 0.15);
+}
+
+.patient-avatar-circle {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 1.5px solid #D1C4E9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.active-dot-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #43A047;
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #FFFFFF;
+}
+
+.patient-main-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.patient-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.patient-card-name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  color: #212121;
+}
+
+.patient-age-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: #757575;
+}
+
+.patient-stage-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.stage-pill-green { background: #E8F5E9; color: #2E7D32; border: 1px solid #A5D6A7; }
+.stage-pill-amber { background: #FFF8E1; color: #E65100; border: 1px solid #FFE082; }
+.stage-pill-purple { background: #EDE7F6; color: #512DA8; border: 1px solid #D1C4E9; }
+
+.patient-location-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #5E35B1;
+  font-weight: 600;
+}
+
+.patient-notes-snippet {
+  font-size: 11px;
+  color: #616161;
+  font-style: italic;
+  margin: 2px 0 0;
+}
+
+.patient-card-action {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.current-active-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #2E7D32;
+}
+
+.btn-switch-patient {
+  padding: 6px 12px;
+  background: #673AB7;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-switch-patient:hover {
+  background: #512DA8;
+  transform: translateY(-1px);
+}
+
+/* Register Patient Form */
+.register-patient-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-grid-2col {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .form-grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-input-group label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #37474F;
+}
+
+.form-input-group input,
+.form-input-group select,
+.form-input-group textarea {
+  padding: 8px 12px;
+  border: 1.5px solid #CFD8DC;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #263238;
+  background: #FFFFFF;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.form-input-group input:focus,
+.form-input-group select:focus,
+.form-input-group textarea:focus {
+  border-color: #673AB7;
+}
+
+.form-input-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-action-row,
+.change-pin-btn-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn-secondary {
+  padding: 8px 16px;
+  background: #F5F5F5;
+  border: 1.5px solid #CFD8DC;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #616161;
+  cursor: pointer;
+}
+
+.btn-primary {
+  padding: 8px 18px;
+  background: #673AB7;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(103, 58, 183, 0.3);
+}
+
+.btn-primary:hover {
+  background: #512DA8;
+}
+
+

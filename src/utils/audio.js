@@ -421,3 +421,167 @@ export function stopNatureAmbience() {
   isNaturePlaying = false;
 }
 
+// Procedural Zen Garden Ambient BGM Synthesizer
+let gardenBgmTimer = null;
+let gardenDroneOsc = null;
+let gardenDroneGain = null;
+let isGardenBgmPlaying = false;
+
+const ZEN_PENTATONIC_FREQS = [
+  329.63, // E4
+  392.00, // G4
+  440.00, // A4
+  493.88, // B4
+  587.33, // D5
+  659.25, // E5
+  783.99, // G5
+  880.00  // A5
+];
+
+export function startGardenBgm() {
+  if (isGardenBgmPlaying || isMuted) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  isGardenBgmPlaying = true;
+
+  try {
+    // 1. Warm ambient sub-drone
+    gardenDroneOsc = ctx.createOscillator();
+    gardenDroneGain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(220, ctx.currentTime);
+
+    gardenDroneOsc.type = 'sine';
+    gardenDroneOsc.frequency.setValueAtTime(164.81, ctx.currentTime); // E3
+
+    gardenDroneGain.gain.setValueAtTime(0.001, ctx.currentTime);
+    gardenDroneGain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 3);
+
+    gardenDroneOsc.connect(filter);
+    filter.connect(gardenDroneGain);
+    gardenDroneGain.connect(ctx.destination);
+    gardenDroneOsc.start();
+  } catch {}
+
+  // 2. Procedural wind chime melody loop
+  let noteIndex = 0;
+  const scheduleNextChime = () => {
+    if (!isGardenBgmPlaying) return;
+    const freq = ZEN_PENTATONIC_FREQS[Math.floor(Math.random() * ZEN_PENTATONIC_FREQS.length)];
+    playGardenChime(freq);
+
+    const delayMs = 1200 + Math.random() * 1600;
+    gardenBgmTimer = setTimeout(scheduleNextChime, delayMs);
+  };
+
+  scheduleNextChime();
+}
+
+function playGardenChime(freq) {
+  if (isMuted || !isGardenBgmPlaying) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+    gain.gain.setValueAtTime(0.001, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.2);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 2.3);
+  } catch {}
+}
+
+export function stopGardenBgm() {
+  isGardenBgmPlaying = false;
+  if (gardenBgmTimer) {
+    clearTimeout(gardenBgmTimer);
+    gardenBgmTimer = null;
+  }
+  if (gardenDroneOsc && gardenDroneGain) {
+    try {
+      const ctx = getAudioContext();
+      if (ctx) {
+        gardenDroneGain.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.8);
+      }
+      setTimeout(() => {
+        try {
+          gardenDroneOsc?.stop();
+          gardenDroneOsc?.disconnect();
+          gardenDroneGain?.disconnect();
+        } catch {}
+        gardenDroneOsc = null;
+        gardenDroneGain = null;
+      }, 900);
+    } catch {}
+  }
+}
+
+export function isGardenBgmActive() {
+  return isGardenBgmPlaying;
+}
+
+export function playWaterSplashSound() {
+  if (isMuted) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(600, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.35);
+
+    gain.gain.setValueAtTime(soundVolume * 0.35, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.38);
+  } catch {}
+}
+
+export function playBloomSound() {
+  if (isMuted) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  try {
+    const notes = [440, 554.37, 659.25, 880];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.08);
+
+      gain.gain.setValueAtTime(0.001, ctx.currentTime + idx * 0.08);
+      gain.gain.linearRampToValueAtTime(soundVolume * 0.25, ctx.currentTime + idx * 0.08 + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.08 + 0.9);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(ctx.currentTime + idx * 0.08);
+      osc.stop(ctx.currentTime + idx * 0.08 + 0.95);
+    });
+  } catch {}
+}
+
+
