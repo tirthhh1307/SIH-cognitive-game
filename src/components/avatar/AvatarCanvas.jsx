@@ -98,18 +98,19 @@ export default function AvatarCanvas({
             morphMeshes.push(child);
           }
           if (child.isMesh) {
-            const name = (child.name || '').toLowerCase();
             const materials = Array.isArray(child.material) ? child.material : [child.material];
             materials.filter(Boolean).forEach(mat => {
-              // T-shirt / body clothing → black
-              if (name.includes('body') || name.includes('cloth') || name.includes('shirt') || name.includes('top') || name.includes('outfit')) {
-                mat.color = new THREE.Color(0x111111);
+              const matName = mat.name || '';
+
+              // Black T-Shirt
+              if (matName.includes('Tops') || matName.includes('CLOTH') && !matName.includes('Bottoms') && !matName.includes('Shoes')) {
+                mat.color = new THREE.Color(0x181818);
                 mat.needsUpdate = true;
               }
-              // Skin / face → slightly darker
-              if (name.includes('face') || name.includes('skin') || name.includes('head')) {
-                const c = mat.color || new THREE.Color(1, 1, 1);
-                mat.color = new THREE.Color(c.r * 0.78, c.g * 0.72, c.b * 0.65);
+              // Tan Skin for Body and Face
+              else if (matName.includes('SKIN') || matName.includes('Body') || matName.includes('Face_00')) {
+                // Tint texture to warm tan skin tone
+                mat.color = new THREE.Color(0.86, 0.72, 0.62);
                 mat.needsUpdate = true;
               }
             });
@@ -117,27 +118,51 @@ export default function AvatarCanvas({
         });
         if (!morphMeshes.length) unavailableRef.current?.();
 
-        // Rotate arms from T-pose to natural arms-down rest pose
-        const armBoneMap = {
-          leftUpper:  ['J_Bip_L_UpperArm', 'leftUpperArm', 'mixamorig:LeftArm', 'LeftArm', 'Left arm', 'Arm_L'],
-          rightUpper: ['J_Bip_R_UpperArm', 'rightUpperArm', 'mixamorig:RightArm', 'RightArm', 'Right arm', 'Arm_R'],
-          leftLower:  ['J_Bip_L_LowerArm', 'leftLowerArm', 'mixamorig:LeftForeArm', 'LeftForeArm', 'Left elbow', 'Elbow_L'],
-          rightLower: ['J_Bip_R_LowerArm', 'rightLowerArm', 'mixamorig:RightForeArm', 'RightForeArm', 'Right elbow', 'Elbow_R'],
-        };
-        const findBone = (root, names) => {
-          let found = null;
-          root.traverse(node => { if (!found && node.isBone && names.includes(node.name)) found = node; });
-          return found;
-        };
+        // Rotate arms & sleeves down from T-pose to natural resting pose
         const deg = Math.PI / 180;
-        const leftUpper = findBone(currentModel, armBoneMap.leftUpper);
-        const rightUpper = findBone(currentModel, armBoneMap.rightUpper);
-        const leftLower = findBone(currentModel, armBoneMap.leftLower);
-        const rightLower = findBone(currentModel, armBoneMap.rightLower);
-        if (leftUpper)  leftUpper.rotation.z += 70 * deg;
-        if (rightUpper) rightUpper.rotation.z -= 70 * deg;
-        if (leftLower)  leftLower.rotation.z += 5 * deg;
-        if (rightLower) rightLower.rotation.z -= 5 * deg;
+        const findNode = name => {
+          let target = null;
+          currentModel.traverse(node => {
+            if (!target && node.name === name) target = node;
+          });
+          return target;
+        };
+
+        // Left arm & sleeve (Z negative rotates down)
+        const leftUpper = findNode('J_Bip_L_UpperArm');
+        const leftSleeve = findNode('J_Aim_L_TopsUpperArm');
+        const leftLower = findNode('J_Bip_L_LowerArm');
+        if (leftUpper) {
+          leftUpper.rotation.z -= 70 * deg;
+          leftUpper.rotation.y += 10 * deg;
+          leftUpper.rotation.x += 5 * deg;
+        }
+        if (leftSleeve) {
+          leftSleeve.rotation.z -= 70 * deg;
+          leftSleeve.rotation.y += 10 * deg;
+        }
+        if (leftLower) {
+          leftLower.rotation.z -= 10 * deg;
+          leftLower.rotation.y += 15 * deg;
+        }
+
+        // Right arm & sleeve (Z positive rotates down)
+        const rightUpper = findNode('J_Bip_R_UpperArm');
+        const rightSleeve = findNode('J_Aim_R_TopsUpperArm');
+        const rightLower = findNode('J_Bip_R_LowerArm');
+        if (rightUpper) {
+          rightUpper.rotation.z += 70 * deg;
+          rightUpper.rotation.y -= 10 * deg;
+          rightUpper.rotation.x += 5 * deg;
+        }
+        if (rightSleeve) {
+          rightSleeve.rotation.z += 70 * deg;
+          rightSleeve.rotation.y -= 10 * deg;
+        }
+        if (rightLower) {
+          rightLower.rotation.z += 10 * deg;
+          rightLower.rotation.y -= 15 * deg;
+        }
 
         applyTexture(currentModel);
       },
