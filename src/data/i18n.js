@@ -18,7 +18,7 @@ const messages = {
     'nav.caregiver': 'Caregiver',
     'header.hello': 'Hello,',
     'header.welcome': 'Welcome!',
-    'header.subtitle': "Let's have a fun and happy day!",
+    'header.subtitle': "Let's kick things off with a smile!",
     'header.stars': 'Stars',
     'header.language': 'Language',
     'home.chooseLanguage': 'Select Preferred Language',
@@ -55,7 +55,7 @@ const messages = {
     'feedback.welcome': 'Wonderful work, {name}!',
     'feedback.team': 'Wonderful teamwork, {name}!',
     'feedback.retry': 'Good try. Take another look.',
-    'speech.welcome': "Welcome to Sanjibani! Take your time, relax, and have a peaceful, joyful day.",
+    'speech.welcome': "Welcome to Sanjibani! go at your own pace, unwind,and appreciate the quiet moments.",
     'companion.entry': 'Talk with your companion',
     'companion.entrySub': 'Speak or type. Replies are read aloud.',
     'companion.title': 'Talk with your companion',
@@ -83,7 +83,7 @@ const messages = {
     'nav.caregiver': 'যত্ন সহায়ক',
     'header.hello': 'নমস্কাৰ,',
     'header.welcome': 'স্বাগতম!',
-    'header.subtitle': 'আহক আজিৰ দিনটো আনন্দ আৰু সুখেৰে কটাওঁ!',
+    'header.subtitle': 'ব’লক এটা হাঁহিৰে আৰম্ভ কৰোঁ!',
     'header.stars': 'তৰা',
     'header.language': 'ভাষা (Language)',
     'home.chooseLanguage': 'আপোনাৰ পছন্দৰ ভাষা বাছক',
@@ -120,7 +120,7 @@ const messages = {
     'feedback.welcome': 'বৰ ভাল, {name}!',
     'feedback.team': 'একেলগে বৰ ভাল কৰিলে, {name}!',
     'feedback.retry': 'ভাল চেষ্টা। আকৌ এবাৰ চাওক।',
-    'speech.welcome': "সঞ্জীৱনীত আপোনাক আন্তৰিক স্বাগতম! আপোনাৰ মন সদায় প্ৰশান্ত আৰু আনন্দময় হওক।",
+    'speech.welcome': "সঞ্জীবনীলে আপোনাক স্বাগতম! আপোনাৰ নিজৰ গতিৰে আগবাঢ়ক, ক্লান্তি দূৰ কৰক আৰু শান্ত মুহূৰ্তবোৰ উপভোগ কৰক।",
     'companion.entry': 'আপোনাৰ সংগীৰ সৈতে কথা পাতক',
     'companion.entrySub': 'কওক বা লিখক। উত্তৰ পঢ়ি শুনোৱা হ’ব।',
     'companion.title': 'আপোনাৰ সংগীৰ সৈতে কথা পাতক',
@@ -148,7 +148,7 @@ const messages = {
     'nav.caregiver': 'देखभाल साथी',
     'header.hello': 'नमस्ते,',
     'header.welcome': 'स्वागत है!',
-    'header.subtitle': 'आइए आज का दिन खुशियों और सुकून से बिताएं!',
+    'header.subtitle': 'चलिए मुस्कुराहट के साथ शुरुआत करते हैं!',
     'header.stars': 'सितारे',
     'header.language': 'भाषा (Language)',
     'home.chooseLanguage': 'अपनी पसंदीदा भाषा चुनें',
@@ -185,7 +185,7 @@ const messages = {
     'feedback.welcome': 'बहुत सुंदर प्रयास, {name}!',
     'feedback.team': 'आप दोनों ने बहुत अच्छा किया, {name}!',
     'feedback.retry': 'अच्छा प्रयास। एक बार फिर से देखें।',
-    'speech.welcome': "संजीवनी में आपका हार्दिक स्वागत है! शांत मन से खेलें और एक सुखद दिन बिताएं।"
+    'speech.welcome': "संजीवनी में आपका स्वागत है! अपनी गति से चलें, तनावमुक्त हों और शांत पलों का आनंद लें"
   },
   mni: {
     'nav.home': 'য়ুম (Home)',
@@ -195,7 +195,7 @@ const messages = {
     'nav.caregiver': 'য়োকখৎপীবা (Caregiver)',
     'header.hello': 'খুরুমজরি,',
     'header.welcome': 'তরাম্না ওকচরি!',
-    'header.subtitle': 'ঙসিগী নুমিৎ অসি হরাও-তয়াম্না লেঞ্জসি!',
+    'header.subtitle': 'লাকসি নোংমীনবা অমগা লোইননা হৌসি!',
     'header.stars': 'থোয়ানমীচাক',
     'header.language': 'লোন (Language)',
     'home.chooseLanguage': 'অদোমগী পাম্বা লোন খনবিবিয়ু',
@@ -232,7 +232,7 @@ const messages = {
     'feedback.welcome': 'য়াম্না ফরে, {name}!',
     'feedback.team': 'য়াম্না ফনা তৌরে, {name}!',
     'feedback.retry': 'ফবা হোৎনবা। অমুক য়েংসি।',
-    'speech.welcome': "সঞ্জীবনীদা অদোম্বু তরাম্না ওকচরি! নুংঙাই-য়াইফবা অমসুং শান্ত ওইবা নুমিৎ অমা ওইরসনু।"
+    'speech.welcome': "সঞ্জীবনীদা অদোম্বু তরাম্না ওকচরি! অদোমগী পাম্লীবা মওংদা তপ্না চতসি, ৱাখল খঙহৌদনা থমসি অমসুং তুমিন লৈবা তানজাশিংগী নুংঙাইবা লৌসি।"
   },
   trp: {
     'nav.home': 'নখল (Home)',
@@ -242,7 +242,7 @@ const messages = {
     'nav.caregiver': 'যত্ন নায়য়া (Caregiver)',
     'header.hello': 'খুলুমখা,',
     'header.welcome': 'লামকাহাম!',
-    'header.subtitle': 'আজি সাল কাহাম অমসুং কুশল ক্তুং!',
+    'header.subtitle': 'খাওই মিনিমুং বাই চেনসিদি!',
     'header.stars': 'আথুকিরি',
     'header.language': 'কক (Language)',
     'home.chooseLanguage': 'নিনি পছন্দনি কক বাসিক',
@@ -279,7 +279,7 @@ const messages = {
     'feedback.welcome': 'বেল কাহাম খালাইখা, {name}!',
     'feedback.team': 'লগ থাই বেল কাহাম খালাইখা, {name}!',
     'feedback.retry': 'কাহাম চেষ্টা। অমুক নাইসিক।',
-    'speech.welcome': "সঞ্জীবনী-ত নিনি ত্থাং-মা নাইমুং! নিনি সাল কাহাম অমসুং শান্তি ক্তুং।"
+    'speech.welcome': "সঞ্জীবনী-অ নিনি ত্থাং-মা নাইমুং! নিনি ত্থাংমুং বাই ত্থাংদি, মুখ্রাবদি অমসুং সাকাতুং কুইতৌ তংমুং রিনি।"
   }
 };
 
