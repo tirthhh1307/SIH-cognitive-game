@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Apon Mon - SIH Winning Presentation Deck</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Noto+Sans+Bengali:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  :root {
+    --bg-dark: #070913;
+    --bg-card: rgba(18, 24, 43, 0.75);
+    --bg-card-border: rgba(255, 255, 255, 0.1);
+    --accent-emerald: #10B981;
+    --accent-teal: #14B8A6;
+    --accent-gold: #F59E0B;
+    --accent-purple: #8B5CF6;
+    --accent-rose: #F43F5E;
+    --accent-blue: #3B82F6;
+    --text-main: #F8FAFC;
+    --text-muted: #94A3B8;
+    --text-dim: #64748B;
+  }
+
+  @page {
+    size: 16in 9in;
+    margin: 0;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  .slide {
+    width: 16in;
+    height: 9in;
+    page-break-after: always;
+    page-break-inside: avoid;
+    position: relative;
+    overflow: hidden;
+    padding: 2.2rem 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: radial-gradient(circle at 85% 15%, rgba(20, 184, 166, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(99, 102, 241, 0.1) 0%, transparent 45%),
+                #070913;
+  }
+
+  /* Watermark / Header decoration */
+  .slide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .slide-category {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .slide-category::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--accent-teal);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--accent-teal);
+  }
+
+  .slide-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .slide-title-wrap {
+    margin-bottom: 1.2rem;
+  }
+
+  .slide-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .slide-title span.highlight {
+    background: linear-gradient(135deg, #2DD4BF, #38BDF8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .slide-subtitle {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .content-grid {
+    flex: 1;
+    display: grid;
+    gap: 1.2rem;
+  }
+
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .grid-1-2 { grid-template-columns: 1fr 2fr; }
+  .grid-2-1 { grid-template-columns: 2fr 1fr; }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 14px;
+    padding: 1.2rem 1.4rem;
+    backdrop-filter: blur(16px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    position: relative;
+  }
+
+  .card-glow {
+    border-color: rgba(45, 212, 191, 0.3);
+    box-shadow: 0 8px 32px rgba(20, 184, 166, 0.08);
+  }
+
+  .card-gold {
+    border-color: rgba(245, 158, 11, 0.3);
+    box-shadow: 0 8px 32px rgba(245, 158, 11, 0.08);
+  }
+
+  .card-purple {
+    border-color: rgba(139, 92, 246, 0.3);
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.08);
+  }
+
+  .card-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .pill-emerald { background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); }
+  .pill-gold { background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3); }
+  .pill-blue { background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); }
+  .pill-purple { background: rgba(139, 92, 246, 0.15); color: #A78BFA; border: 1px solid rgba(139, 92, 246, 0.3); }
+  .pill-rose { background: rgba(244, 63, 94, 0.15); color: #FB7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+
+  .stat-num {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #FFFFFF;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  ul.bullet-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  ul.bullet-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: #CBD5E1;
+  }
+
+  ul.bullet-list li::before {
+    content: '▹';
+    color: var(--accent-teal);
+    font-size: 1.1rem;
+    line-height: 1.3;
+  }
+
+  .slide-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 0.8rem;
+    margin-top: 1.2rem;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  /* Diagram Box */
+  .diagram-node {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: #E2E8F0;
+  }
+
+  .arrow-flow {
+    color: var(--accent-teal);
+    font-weight: 700;
+    text-align: center;
+    font-size: 1.1rem;
+  }
+
+  table.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  table.styled-table th {
+    background: rgba(255, 255, 255, 0.06);
+    color: #F8FAFC;
+    text-align: left;
+    padding: 8px 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  table.styled-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: #CBD5E1;
+  }
+
+  /* Specific Slide Styles */
+  .cover-slide {
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    background: radial-gradient(circle at 50% 50%, rgba(20, 184, 166, 0.18) 0%, transparent 60%),
+                radial-gradient(circle at 20% 80%, rgba(245, 158, 11, 0.12) 0%, transparent 50%),
+                #070913;
+  }
+
+  .cover-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 3.8rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #FFFFFF 30%, #5EEAD4 70%, #38BDF8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .cover-assamese {
+    font-family: 'Noto Sans Bengali', sans-serif;
+    font-size: 2rem;
+    color: #FBBF24;
+    font-weight: 700;
+    margin-top: -10px;
+  }
+
+  .cover-tagline {
+    font-size: 1.3rem;
+    color: #CBD5E1;
+    max-width: 900px;
+    margin: 0 auto;
+    font-weight: 400;
+  }
+
+  .badge-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ==========================================
+     SLIDE 1: TITLE SLIDE
+     ========================================== -->
+<section class="slide cover-slide">
+  <div class="badge-row">
+    <span class="pill pill-gold">Smart India Hackathon 2024 / 2025</span>
+    <span class="pill pill-emerald">Healthcare & MedTech Category</span>
+    <span class="pill pill-blue">Problem Statement ID: SIH-MED-2024</span>
+  </div>
+
+  <div>
+    <h1 class="cover-title">Apon Mon (আপোন মন)</h1>
+    <div class="cover-assamese">আপোনাৰ চিনাকি মনৰ সংগী — Cognitive Companion</div>
+  </div>
+
+  <p class="cover-tagline">
+    Culturally Familiar, Offline-First Cognitive Engagement, Dignified Memory Anchors, and Local Care Tracking for Older Adults & ASHA Workers in North East India.
+  </p>
+
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; max-width: 1050px; margin-top: 15px;">
+    <div class="card" style="padding: 1rem; text-align: center;">
+      <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Core Engine</div>
+      <div style="font-size: 1.05rem; font-weight: 700; color: #34D399; margin-top: 4px;">28 Localized Games</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted);">Assamese & English Multi-Stage</div>
+    </div>
+    <div class="card" style="padding: 1rem; text-align: center;">
+      <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Architecture</div>
+      <div style="font-size: 1.05rem; font-weight: 700; color: #60A5FA; margin-top: 4px;">100% Offline-First</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted);">PWA + Local IndexedDB Queue</div>
+    </div>
+    <div class="card" style="padding: 1rem; text-align: center;">
+      <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">AI Companion</div>
+      <div style="font-size: 1.05rem; font-weight: 700; color: #FBBF24; margin-top: 4px;">3D VRM & Edge AI</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted);">Faster Whisper + Gemini 3.1</div>
+    </div>
+    <div class="card" style="padding: 1rem; text-align: center;">
+      <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Community Impact</div>
+      <div style="font-size: 1.05rem; font-weight: 700; color: #A78BFA; margin-top: 4px;">ASHA Multi-Patient Hub</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted);">Explainable Gap Map Analytics</div>
+    </div>
+  </div>
+
+  <div class="slide-footer" style="width: 100%; border-top: none; justify-content: center; gap: 40px;">
+    <span><strong>Team:</strong> Visionaries (Team Apon Mon)</span>
+    <span><strong>Target Region:</strong> Assam & North East India</span>
+    <span><strong>Stack:</strong> React 18 · Three.js · FastAPI · Gemini · Faster Whisper</span>
+  </div>
+</section>
+
+<!-- ==========================================
+     SLIDE 2: PROBLEM STATEMENT & MOTIVATION
+     ========================================== -->
+<section class="slide">
+  <div class="slide-header">
+    <div class="slide-category">Problem Analysis & Motivation</div>
+    <div class="slide-id">SLIDE 02 / 10</div>
+  </div>
+
+  <div class="slide-title-wrap">
+    <h2 class="slide-title">The Rural Dementia Challenge: <span class="highlight">Alienation & Lack of Tools</span></h2>
+    <p class="slide-subtitle">Over 8.8 million Indians live with dementia, yet 90% in rural regions remain undetected and unsupported.</p>
+  </div>
+
+  <div class="content-grid grid-3">
+    <div class="card">
+      <span class="pill pill-rose">Barrier 1: Cultural & Linguistic</span>
+      <div class="card-title">Western & Abstract Games</div>
+      <ul class="bullet-list">
+        <li>Existing cognitive apps rely on sterile shapes, neon timers, and English text.</li>
+        <li>Older rural adults experience intimidation, agitation, and immediate abandonment.</li>
+        <li>No integration of regional heritage (Bihu, Majuli pottery, Loktak weaving, Hornbill).</li>
+      </ul>
+      <div style="margin-top: auto; padding: 8px 12px; background: rgba(244, 63, 94, 0.1); border-radius: 8px; font-size: 0.82rem; color: #FDA4AF;">
+        <strong>Consequence:</strong> High cognitive resistance and non-compliance.
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="pill pill-gold">Barrier 2: Connectivity & Devices</span>
+      <div class="card-title">Unreliable Internet & Cloud Lock</div>
+      <ul class="bullet-list">
+        <li>North East hilly & riverine terrains have frequent network dropouts.</li>
+        <li>Cloud-heavy apps fail entirely during power cuts or remote village field visits.</li>
+        <li>High server subscription costs exclude rural primary healthcare centers.</li>
+      </ul>
+      <div style="margin-top: auto; padding: 8px 12px; background: rgba(245, 158, 11, 0.1); border-radius: 8px; font-size: 0.82rem; color: #FDE68A;">
+        <strong>Consequence:</strong> Zero accessibility in remote ASHA circles.
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="pill pill-blue">Barrier 3: Diagnostic Stigma</span>
+      <div class="card-title">Caregiver Burden & Stigma</div>
+      <ul class="bullet-list">
+        <li>Clinical questionnaires induce fear of "failing a mental test".</li>
+        <li>Caregivers lack structured, dignified ways to stimulate loved ones daily.</li>
+        <li>No explainable local tracking to assist doctors during periodic reviews.</li>
+      </ul>
+      <div style="margin-top: auto; padding: 8px 12px; background: rgba(59, 130, 246, 0.1); border-radius: 8px; font-size: 0.82rem; color: #BFDBFE;">
+        <strong>Consequence:</strong> Delayed intervention & severe caregiver burnout.
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>Smart India Hackathon Presentation</span>
+    <span>Apon Mon — Cultural Cognitive Companion</span>
+  </div>
+</section>
+
+<!-- ==========================================
+     SLIDE 3: PROPOSED SOLUTION & INNOVATION
+     ========================================== -->
+<section class="slide">
+  <div class="slide-header">
+    <div class="slide-category">Proposed Solution</div>
+    <div class="slide-id">SLIDE 03 / 10</div>
+  </div>
+
+  <div class="slide-title-wrap">
+    <h2 class="slide-title">Apon Mon: <span class="highlight">A Dignified, Culturally-Rooted Ecosystem</span></h2>
+    <p class="slide-subtitle">Transforming cognitive exercise from a stressful clinical chore into a peaceful, celebratory daily ritual.</p>
+  </div>
+
+  <div class="content-grid grid-4">
+    <div class="card card-glow">
+      <span class="pill pill-emerald">01 · Cognitive Games</span>
+      <div class="card-title">28 Cultural Games</div>
+      <p style="font-size: 0.88rem; color: #94A3B8;">10 categories spanning Mild, Moderate, and Severe stages. Featuring Assamese tea gardens, Bihu instruments, and NE wildlife.</p>
+      <div style="font-size: 0.8rem; color: #34D399; font-weight: 600;">✓ Zero Failure / Calm Retries</div>
+    </div>
+
+    <div class="card card-gold">
+      <span class="pill pill-gold">02 · Reminiscence</span>
+      <div class="card-title">Dignified Anchors</div>
+      <p style="font-size: 0.88rem; color: #94A3B8;">Private family photo albums with voice recordings stored in browser IndexedDB. Preserves core personal identity offline.</p>
+      <div style="font-size: 0.8rem; color: #FBBF24; font-weight: 600;">✓ Zero Cloud Photo Leakage</div>
+    </div>
+
+    <div class="card card-purple">
+      <span class="pill pill-purple">03 · Reward System</span>
+      <div class="card-title">Memory Garden</div>
+      <p style="font-size: 0.88rem; color: #94A3B8;">Positive reinforcement loop: stars earned from games are spent watering traditional tea bushes, orchids, and Brahma Kamal.</p>
+      <div style="font-size: 0.8rem; color: #A78BFA; font-weight: 600;">✓ Soothing Web Audio Synthesizer</div>
+    </div>
+
+    <div class="card">
+      <span class="pill pill-blue">04 · Clinical Support</span>
+      <div class="card-title">ASHA Gap Map</div>
+      <p style="font-size: 0.88rem; color: #94A3B8;">Multi-patient switcher with PIN security ('1234'). Displays Memory Gap Map, 5-game baselines, and one-click PDF clinical export.</p>
+      <div style="font-size: 0.8rem; color: #60A5FA; font-weight: 600;">✓ Outbox Auto-Sync Queue</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 0.5rem; padding: 0.9rem 1.4rem; background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.08);">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div style="font-size: 0.95rem; color: #F8FAFC;">
+        <strong>Design Ethos:</strong> WCAG 2.2 AA accessibility, large 64px touch targets, high contrast, Assamese voice read-aloud, and zero competitive pressure.
+      </div>
+      <span class="pill pill-emerald">Zero-Cost Offline Core</span>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>Smart India Hackathon Presentation</span>
+    <span>Apon Mon — Solution Architecture</span>
+  </div>
+</section>
+
+<!-- ==========================================
+     SLIDE 4: SYSTEM ARCHITECTURE & DATA FLOW
+     ========================================== -->
+<section class="slide">
+  <div class="slide-header">
+    <div class="slide-category">Technical Approach</div>
+    <div class="slide-id">SLIDE 04 / 10</div>
+  </div>
+
+  <div class="slide-title-wrap">
+    <h2 class="slide-title">System Architecture: <span class="highlight">Multi-Tier Edge & Offline Pipeline</span></h2>
+    <p class="slide-subtitle">Complete decoupling of offline client logic from optional edge AI enhancement microservices.</p>
+  </div>
+
+  <div class="content-grid grid-1-2" style="gap: 1.2rem;">
+    <!-- Architecture Breakdown -->
+    <div class="card">
+      <div class="card-title">Architecture Pillars</div>
+      <ul class="bullet-list" style="font-size: 0.88rem;">
+        <li><strong>Layer 1 (UI Shell):</strong> React 18 + Vite PWA + Service Worker cache for zero-bandwidth asset delivery.</li>
+        <li><strong>Layer 2 (State Engine):</strong> <code style="color:#5EEAD4">platform.js</code> manages localStorage attempts, settings, and dynamic adaptive levels.</li>
+        <li><strong>Layer 3 (Private Media):</strong> <code style="color:#FBBF24">mediaStore.js</code> stores encrypted Blob photos and voice clips in IndexedDB.</li>
+        <li><strong>Layer 4 (Sync Hub):</strong> <code style="color:#A78BFA">syncQueue.js</code> maintains an offline outbox queue with auto-reconnection flushing.</li>
+        <li><strong>Layer 5 (AI Service):</strong> FastAPI microservice hosting Faster Whisper STT & Gemini 3.1 Flash-Lite.</li>
+      </ul>
+    </div>
+
+    <!-- Visual Architecture Flow -->
+    <div class="card card-glow" style="display: flex; flex-direction: column; justify-content: space-around;">
+      <div style="font-size: 0.95rem; font-weight: 700; color: #FFFFFF; margin-bottom: 6px;">End-to-End Data & Execution Flow</div>
+      
+      <div style="display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 8px; align-items: center;">
+        <div class="diagram-node" style="border-color: rgba(45, 212, 191, 0.4); text-align: center;">
+          <div style="font-weight: 700; color: #2DD4BF;">Client UI (PWA)</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim);">React 18 / Lucide / Anime.js</div>
+        </div>
+        <div class="arrow-flow">⇄</div>
+        <div class="diagram-node" style="border-color: rgba(245, 158, 11, 0.4); text-align: center;">
+          <div style="font-weight: 700; color: #FBBF24;">Local Data Core</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim);">localStorage + IndexedDB</div>
+        </div>
+        <div class="arrow-flow">⇄</div>
+        <div class="diagram-node" style="border-color: rgba(139, 92, 246, 0.4); text-align: center;">
+          <div style="font-weight: 700; color: #A78BFA;">Sync Outbox</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim);">Mutex FIFO Reconnect Queue</div>
+        </div>
+      </div>
+
+      <div style="text-align: center; color: var(--accent-teal); font-weight: 700; font-size: 1.1rem; margin: 4px 0;">↕ Optional Edge Enhancement ↕</div>
+
+      <div style="display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 8px; align-items: center;">
+        <div class="diagram-node" style="border-color: rgba(59, 130, 246, 0.4); text-align: center;">
+          <div style="font-weight: 700; color: #60A5FA;">FastAPI Gateway</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim);">Port 8000 / CORS Safe</div>
+        </div>
+        <div class="arrow-flow">→</div>
+        <div class="diagram-node" style="border-color: rgba(244, 63, 94, 0.4); text-align: center;">
+          <div style="font-weight: 700; color: #FB7185;">Faster Whisper STT</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim);">CPU-Optimized Base Model</div>
+        </div>
+        <div class="arrow-flow">→</div>
+        <div class="diagram-node" style="border-color: rgba(16, 185, 129, 0.4); text-align: center;">
+          <div style="font-weight: 700; color: #34D399;">Gemini 3.1 Flash-Lite</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim);">Prompt-Augmented Care Persona</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>Smart India Hackathon Presentation</span>
+    <span>Apon Mon — Architecture Pipeline</span>
+  </div>
+</section>
+
+<!-- ==========================================
+     SLIDE 5: ADAPTIVE ML & COGNITIVE ENGINE
+     ========================================== -->
+<section class="slide">
+  <div class="slide-header">
+    <div class="slide-category">Clinical & Algorithmic Design</div>
+    <div class="slide-id">SLIDE 05 / 10</div>
+  </div>
+
+  <div class="slide-title-wrap">
+    <h2 class="slide-title">Adaptive Engine & <span class="highlight">Memory Gap Map Analytics</span></h2>
+    <p class="slide-subtitle">Dynamic difficulty calibration preserving dignity while mapping longitudinal cognitive trends.</p>
+  </div>
+
+  <div class="content-grid grid-2">
+    <!-- Adaptive Difficulty Rule -->
+    <div class="card">
+      <div class="card-title">Dynamic Difficulty Adjustment Algorithm</div>
+      <p style="font-size: 0.88rem; color: var(--text-muted);">
+        Runs locally in <code style="color:#5EEAD4">platform.js:getAdaptiveDifficulty()</code> after each session without sending telemetry to cloud.
+      </p>
+      
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+        <div class="diagram-node" style="border-left: 3px solid #10B981;">
+          <strong style="color: #34D399;">Level Progression (Level +1):</strong>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Recent 5-game accuracy ≥ 85% with 0 hints used → Smooth transition to higher stimuli count.</div>
+        </div>
+        <div class="diagram-node" style="border-left: 3px solid #F59E0B;">
+          <strong style="color: #FBBF24;">Gentle Support (Level -1):</strong>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Recent accuracy &lt; 50% OR hints ≥ 2 → Automatically simplify choice pool to avoid frustration.</div>
+        </div>
+        <div class="diagram-node" style="border-left: 3px solid #3B82F6;">
+          <strong style="color: #60A5FA;">Severe Stage Safeguard:</strong>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">Locks to binary 2-choice tactile buttons, infinite time, and soothing voice guidance.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 Cognitive Domains & Gap Map -->
+    <div class="card card-purple">
+      <div class="card-title">5-Domain Memory Gap Map</div>
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Domain</th>
+            <th>Sample Games</th>
+            <th>Clinical Marker Tracked</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. Memory Recall</strong></td>
+            <td>Tea Estate Memory, Photo Match</td>
+            <td>Short-term visual retrieval & delayed recognition</td>
+          </tr>
+          <tr>
+            <td><strong>2. Spatial Orientation</strong></td>
+            <td>Brahmaputra Ferry, River Crossing</td>
+            <td>Topographical navigation & 2D spatial reasoning</td>
+          </tr>
+          <tr>
+            <td><strong>3. Language & Naming</strong></td>
+            <td>Assamese Word Weaver, Rhymes</td>
+            <td>Semantic fluency & expressive naming</td>
+          </tr>
+          <tr>
+            <td><strong>4. Executive & Attention</strong></td>
+            <td>Odd One Out, Majuli Mask Sorting</td>
+            <td>Inhibitory control & category shifting</td>
+          </tr>
+          <tr>
+            <td><strong>5. Logic & Number Sense</strong></td>
+            <td>Market Coin Counter, Fish Count</td>
+            <td>Daily functional arithmetic preservation</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>Smart India Hackathon Presentation</span>
+    <span>Apon Mon — Adaptive Cognitive Engine</span>
+  </div>
+</section>
+
+<!-- ==========================================
+     SLIDE 6: AVATAR PIPELINE: WORKING VS VISION
+     ========================================== -->
+<section class="slide">
+  <div class="slide-header">
+    <div class="slide-category">AI Avatar Subsystem</div>
+    <div class="slide-id">SLIDE 06 / 10</div>
+  </div>
+
+  <div class="slide-title-wrap">
+    <h2 class="slide-title">AI Avatar Companion: <span class="highlight">Current Prototype vs. Future Vision</span></h2>
+    <p class="slide-subtitle">Balancing immediate offline rural feasibility today with bleeding-edge photorealistic neural family avatars tomorrow.</p>
+  </div>
+
+  <div class="content-grid grid-2">
+    <!-- Current Working System -->
+    <div class="card card-glow">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="pill pill-emerald">Working in Current Build</span>
+        <span style="font-size: 0.75rem; color: #34D399; font-weight: 700;">● ZERO-GPU CLIENT</span>
+      </div>
+      <div class="card-title">Current Interactive 3D VRM Pipeline</div>
+      <ul class="bullet-list" style="font-size: 0.85rem;">
+        <li><strong>3-Angle Camera Capture:</strong> <code style="color:#5EEAD4">AvatarOnboardingModal.jsx</code> captures front/left/right photos of family member.</li>
+        <li><strong>Local Canvas Normalization:</strong> 512x512 normalized texture generated in browser canvas & stored in IndexedDB.</li>
+        <li><strong>3D Mesh Rigging:</strong> Loaded via Three.js and <code style="color:#5EEAD4">@pixiv/three-vrm</code> in <code style="color:#5EEAD4">AvatarCanvas.jsx</code>.</li>
+        <li><strong>Word-Boundary Lip-Sync:</strong> Speech synthesis events drive real-time mouth morphs (<code style="color:#5EEAD4">aa, ih, ou, ee, oh</code>) via <code style="color:#5EEAD4">visemeMapper.js</code>.</li>
+      </ul>
+      <div style="margin-top: auto; padding: 8px 12px; background: rgba(16, 185, 129, 0.1); border-radius: 8px; font-size: 0.8rem; color: #6EE7B7;">
+        <strong>Advantage:</strong> Instant 60 FPS on low-cost ₹6,000 tablet, 100% private, zero network requirement.
+      </div>
+    </div>
+
+    <!-- Future Photorealistic Vision -->
+    <div class="card card-gold">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="pill pill-gold">Future Vision Roadmap</span>
+        <span style="font-size: 0.75rem; color: #FBBF24; font-weight: 700;">○ PHASE 2 RESEARCH</span>
+      </div>
+      <div class="card-title">Photorealistic Neural Family Avatars</div>
+      <ul class="bullet-list" style="font-size: 0.85rem;">
+        <li><strong>3D Gaussian Splatting / FLAME:</strong> Reconstruct precise 3D head geometry & facial skin geometry from 5-second video scan.</li>
+        <li><strong>Few-Shot Voice Cloning:</strong> Lightweight XTTS-v2 / Chatterbox integration to clone grandchild or son's comforting voice.</li>
+        <li><strong>Neural Real-Time Lip-Sync:</strong> LivePortrait / SadTalker diffusion streaming synchronized micro-expressions.</li>
+        <li><strong>Edge Quantization:</strong> NPU-accelerated ONNX runtime targeting upcoming rural mobile chipsets.</li>
+      </ul>
+      <div style="margin-top: auto; padding: 8px 12px; background: rgba(245, 158, 11, 0.1); border-radius: 8px; font-size: 0.8rem; color: #FDE68A;">
+        <strong>Goal:</strong> True photorealistic visual presence of migrating family members for dementia patients.
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>Smart India Hackathon Presentation</span>
+    <span>Apon Mon — Avatar Subsystem & Vision</span>
+  </div>
+</section>
+
+<!-- ==========================================
+     SLIDE 7: ASHA WORKER WORKFLOW & DEPLOYMENT
+     ========================================== -->
+<section class="slide">
+  <div class="slide-header">
+    <div class="slide-category">Field Workflow & Operations</div>
+    <div class="slide-id">SLIDE 07 / 10</div>
+  </div>
+
+  <div class="slide-title-wrap">
+    <h2 class="slide-title">ASHA Worker Workflow: <span class="highlight">Multi-Patient Field Operations</span></h2>
+    <p class="slide-subtitle">Designed for community health workers conducting home visits across Majuli, Bishnupur, and rural districts.</p>
+  </div>
+
+  <div class="content-grid grid-3">
+    <div class="card">
+      <span class="pill pill-emerald">Step 1: Patient Switch</span>
+      <div class="card-title">Instant Profile Switch</div>
+      <ul class="bullet-list">
+        <li>ASHA enters secure PIN ('1234') in <code style="color:#5EEAD4">CaregiverPinModal.jsx</code>.</li>
+        <li>Selects patient (e.g., <em>Biren Das, 72, Majuli</em> or <em>Memi Devi, 68, Loktak</em>).</li>
+        <li>Platform state dynamically switches active baseline and memory anchors.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <span class="pill pill-gold">Step 2: Guided Session</span>
+      <div class="card-title">Assisted Engagement</div>
+      <ul class="bullet-list">
+        <li>ASHA worker conducts 15-minute gentle daily check-in + 3 game rounds.</li>
+        <li>"Together Mode" enabled: ASHA guides without penalizing response time.</li>
+        <li>Stars collected and fed directly into the patient's local memory garden.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <span class="pill pill-purple">Step 3: Sync & Report</span>
+      <div class="card-title">Outbox Batch & Export</div>
+      <ul class="bullet-list">
+        <li>All metrics logged into local FIFO outbox (<code style="color:#A78BFA">syncQueue.js</code>).</li>
+        <li>On reaching PHC with Wi-Fi/4G, outbox auto-flushes in a single batch.</li>
+        <li>Generates printable clinical report PDF for visiting PHC medical officer.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 0.5rem; padding: 0.8rem 1.2rem; background: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.2);">
+    <div style="display: flex; justify-content: space-around; text-align: center;">
+      <div>
+        <div class="stat-num" style="color: #60A5FA; font-size: 1.8rem;">0 KB</div>
+        <div class="stat-label">Data Needed for Core Sessions</div>
+      </div>
+      <div>
+        <div class="stat-num" style="color: #34D399; font-size: 1.8rem;">100%</div>
+        <div class="stat-label">Local Data Encryption & Privacy</div>
+      </div>
+      <div>
+        <div class="stat-num" style="color: #FBBF24; font-size: 1.8rem;">&lt; 5s</div>
+        <div class="stat-label">Batch Auto-Sync Duration</div>
+      </div>
+      <div>
+        <div class="stat-num" style="color: #A78BFA; font-size: 1.8rem;">1-Click</div>
+        <div class="stat-label">Clinical PDF Export for Doctors</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>Smart India Hackathon Presentation</span>
+    <span>Apon Mon — Field Operations</span>
+  </div>
+</section>
+
+<!-- ==========================================
+     SLIDE 8: FEASIBILITY, PRIVACY & COMPLIANCE
+     ========================================== -->
+<section class="slide">
+  <div class="slide-header">
+    <div class="slide-category">Feasibility & Risk Mitigation</div>
+    <div class="slide-id">SLIDE 08 / 10</div>
+  </div>
+
+  <div class="slide-title-wrap">
+    <h2 class="slide-title">Feasibility, Ethics & <span class="highlight">Clinical Boundaries</span></h2>
+    <p class="slide-subtitle">Adhering strictly to Indian healthcare privacy, non-clinical ethics, and low-cost hardware feasibility.</p>
+  </div>
+
+  <div class="content-grid grid-3">
+    <div class="card">
+      <span class="pill pill-emerald">Hardware Feasibility</span>
+      <div class="card-title">Low-Cost Edge Devices</div>
+      <ul class="bullet-list">
+        <li>Runs smoothly on standard quad-core Android tablets (2GB RAM).</li>
+        <li>PWA install size &lt; 8MB with compressed audio assets.</li>
+        <li>Optional AI backend runs on basic dual-core CPU with Faster Whisper INT8 quantization.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <span class="pill pill-gold">Data Privacy & Security</span>
+      <div class="card-title">Zero Cloud Leakage</div>
+      <ul class="bullet-list">
+        <li>Patient photos, voice samples, and daily mood entries NEVER leave the device.</li>
+        <li>Caregiver access strictly gated by PIN lock.</li>
+        <li>One-click complete data wipe (<code style="color:#FBBF24">clearPlatformData()</code>) honoring patient sovereignty.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <span class="pill pill-rose">Ethical Boundary</span>
+      <div class="card-title">Non-Diagnostic Guarantee</div>
+      <ul class="bullet-list">
+        <li>Explicitly marked as an engagement tool, NOT a diagnostic medical device.</li>
+        <li>Never uses scary labels like "Dementia Stage 3" in front of older adults.</li>
+        <li>Reports clearly state: <em>"Supports care conversations; does not replace neurologist consultation."</em></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>Smart India Hackathon Presentation</span>
+    <span>Apon Mon — Feasibility & Ethics</span>
+  </div>
+</section>
+
+<!-- ==========================================
+     SLIDE 9: IMPACT, SCALABILITY & ROADMAP
+     ========================================== -->
+<section class="slide">
+  <div class="slide-header">
+    <div class="slide-category">Impact & Strategic Roadmap</div>
+    <div class="slide-id">SLIDE 09 / 10</div>
+  </div>
+
+  <div class="slide-title-wrap">
+    <h2 class="slide-title">Social Impact & <span class="highlight">3-Phase Scalability Roadmap</span></h2>
+    <p class="slide-subtitle">Scaling from pilot districts in Assam to national primary healthcare integration under Ayushman Bharat.</p>
+  </div>
+
+  <div class="content-grid grid-3">
+    <div class="card card-glow">
+      <span class="pill pill-emerald">Phase 1: Current (SIH Grand Finale)</span>
+      <div class="card-title">Working Prototype</div>
+      <ul class="bullet-list">
+        <li>28 playable cultural games completed.</li>
+        <li>Assamese & English localization verified.</li>
+        <li>PWA offline engine + IndexedDB media vault.</li>
+        <li>Caregiver gap map & PDF export tested.</li>
+        <li>Working 3D VRM avatar with speech lip-sync.</li>
+      </ul>
+    </div>
+
+    <div class="card card-gold">
+      <span class="pill pill-gold">Phase 2: 3–6 Months</span>
+      <div class="card-title">Rural Pilot & Dialects</div>
+      <ul class="bullet-list">
+        <li>Pilot with 50 ASHA workers in Majuli & Bishnupur districts.</li>
+        <li>Addition of Bodo, Manipuri, and Mizo language packs.</li>
+        <li>Integration of lightweight neural voice cloning on edge devices.</li>
+        <li>Clinical validation studies with regional medical colleges (GMCH).</li>
+      </ul>
+    </div>
+
+    <div class="card card-purple">
+      <span class="pill pill-purple">Phase 3: 12+ Months</span>
+      <div class="card-title">National Scale (ABDM)</div>
+      <ul class="bullet-list">
+        <li>Integration with Ayushman Bharat Digital Mission (ABDM) ABHA IDs.</li>
+        <li>Photorealistic 3D Gaussian Head Avatars for remote migrant families.</li>
+        <li>Pan-India regional culture packs (Tamil, Bengali, Marathi, Punjabi).</li>
+        <li>MoHFW Tele-MANAS primary care integration.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>Smart India Hackathon Presentation</span>
+    <span>Apon Mon — Roadmap & Vision</span>
+  </div>
+</section>
+
+<!-- ==========================================
+     SLIDE 10: REFERENCES, TEAM & CONCLUSION
+     ========================================== -->
+<section class="slide cover-slide" style="text-align: left; align-items: stretch; justify-content: space-between;">
+  <div class="slide-header">
+    <div class="slide-category">References & Final Summary</div>
+    <div class="slide-id">SLIDE 10 / 10</div>
+  </div>
+
+  <div class="content-grid grid-2" style="align-items: center;">
+    <div>
+      <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; font-weight: 800; color: #FFFFFF;">
+        Empowering Dignified Cognitive Care with <span class="highlight">Apon Mon</span>
+      </h2>
+      <p style="font-size: 1rem; color: #CBD5E1; margin: 12px 0;">
+        Bridging the gap between modern AI innovation, offline rural resilience, and deep cultural empathy for our elders.
+      </p>
+
+      <div style="display: flex; gap: 15px; margin-top: 20px;">
+        <div class="stat-box" style="background: rgba(255,255,255,0.04); padding: 12px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 1.4rem; font-weight: 700; color: #34D399;">28 Games</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Fully Playable</div>
+        </div>
+        <div class="stat-box" style="background: rgba(255,255,255,0.04); padding: 12px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 1.4rem; font-weight: 700; color: #60A5FA;">100% Offline</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Zero Cloud Dependency</div>
+        </div>
+        <div class="stat-box" style="background: rgba(255,255,255,0.04); padding: 12px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 1.4rem; font-weight: 700; color: #FBBF24;">₹0 Server Cost</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Edge Architecture</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 1.4rem;">
+      <div class="card-title" style="font-size: 1rem; color: var(--accent-teal);">Research & Technical Citations</div>
+      <ul class="bullet-list" style="font-size: 0.8rem; gap: 0.4rem;">
+        <li><strong>ICMR Dementia India Report (2020):</strong> Prevalence & rural healthcare delivery gap.</li>
+        <li><strong>Lancet Commission on Dementia Prevention (2024):</strong> Role of cognitive stimulation & socialization.</li>
+        <li><strong>WCAG 2.2 AA Guidelines:</strong> Accessible design principles for older adults with cognitive decline.</li>
+        <li><strong>Pixiv 3D VRM & WebGL Standard:</strong> Client-side lightweight avatar animation.</li>
+        <li><strong>Smart India Hackathon Benchmarks:</strong> KnitKraft, Voco App, DhwaniSarathi architecture patterns.</li>
+      </ul>
+      <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.85rem; color: #F8FAFC; text-align: center;">
+        <strong>Thank You! Open for Live Demonstration & Q&A.</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>Smart India Hackathon Grand Finale</span>
+    <span>Team Visionaries · Apon Mon Cognitive Companion</span>
+  </div>
+</section>
+
+</body>
+</html>
